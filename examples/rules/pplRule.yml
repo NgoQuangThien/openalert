@@ -26,7 +26,7 @@ fields:
 type: ppl
 filter:
   source=cmccs-*
-exceptions: # đặt trong phần must_not của query
+exceptions: # 
   - name: exception 1
     description: |
       Exception 1 description

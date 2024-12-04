@@ -6,14 +6,13 @@ references:
   - reference 1
 tags:
   - tags 1
-author:
-  - ThienNQ
-  - VietPD
+author: ThienNQ
 enabled: false
 status: experimental  # experimental, test, stable
-date: 2024/12/01
-modified: 2024/12/01
+date: 2023-01-01
+modified: 2023-01-02
 
+type: query
 index:
   - cmccs-*
 fields:
@@ -22,25 +21,21 @@ fields:
     - destination.ip
   excludes:
     - host.mac
+detection:
+  detection_1:
+    - data_stream.type: "logs"
+  detection_2:
+    - data_stream.dataset: "nginx.access"
+  condition: detection_1
 
-type: query
-filter: # đặt trong phần filter của query
-  bool:
-    must:
-    - query_string:
-        query: 'data_stream.type: logs'
-        analyze_wildcard: true
-        time_zone: Asia/Saigon
-exceptions: # đặt trong phần must_not của query
-  - name: exception 1
-    description: |
-      Exception 1 description
-    filter:
-      bool:
-        must_not:
-          - match_phrase:
-              data_stream.dataset: error
-exceptionslist:
+filter:
+  filter_1:
+    data_stream.dataset: "nginx.access"
+  filter_2:
+    data_stream.namespace: "default"
+  condition: not all of filter_*
+
+filterslist:
   - 6e7b1670-a83a-4e89-a151-63a3d4277292
 
 riskscore: 50 # 0-100

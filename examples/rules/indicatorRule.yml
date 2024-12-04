@@ -31,7 +31,6 @@ indicator:
       filter:
         - match_phrase:
             data_stream.dataset: logs
-
   mapping:
     - entries:
       - field: data_stream.dataset

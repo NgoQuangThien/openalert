@@ -20,6 +20,7 @@ class EQLSearch:
  
         if data_type == 'yaml':
             data = self._serialize_date(data)
+            print(json.dumps(data))
  
         # this result in EQL trying the derive the event_type and
         # timestamp from the contents of 'data'
@@ -139,12 +140,12 @@ if __name__ == "__main__":
  
     query = 'process where pid == 424'
     result = eql_search.search(data, query)
-    if result:
-        print('Query:  ' + query + '\nResult: ' +
-              str(len(result)) + ' event(s) ↓\n')
-        pprint(result)
+    # if result:
+    #     print('Query:  ' + query + '\nResult: ' +
+    #           str(len(result)) + ' event(s) ↓\n')
+    #     pprint(result)
  
-    print('\n' + '-' * 80 + '\n')
+    # print('\n' + '-' * 80 + '\n')
  
     with open('data-sources-endpoints.yaml', 'r') as yaml_data:
         data = yaml.safe_load(yaml_data)['data_sources']
@@ -155,4 +156,4 @@ if __name__ == "__main__":
     if result:
         print('Query:  ' + query + '\nResult: ' +
               str(len(result)) + ' event(s) ↓\n')
-        pprint(result)
+        # pprint(result)

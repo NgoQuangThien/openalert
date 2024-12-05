@@ -1,6 +1,6 @@
-import datetime
 import json
 import sys
+from pprint import pprint
 import eql_lib as eql
 
 class EQLSearch:
@@ -27,9 +27,6 @@ class EQLSearch:
 
             eql_events.append(eql.Event(event_type, timestamp_value, item))
         
-        for item in eql_events:
-            print(item)
- 
         return eql_events
 
 
@@ -57,7 +54,7 @@ class EQLSearch:
                 engine.add_query(eql_query)
             except eql.EqlError as e:
                 print(e, file=sys.stderr)
-                print(schema.schema)
+                pprint(schema.schema)
                 return None
 
             engine.add_output_hook(store_result)
@@ -84,7 +81,7 @@ class EQLSearch:
         search_result = self._execute_query(eql_events, query)
  
         return search_result
- 
+
 
 if __name__ == "__main__":
     eql_search = EQLSearch()
@@ -93,9 +90,9 @@ if __name__ == "__main__":
         data = json.load(json_data)
  
     query = r"""
-        network where pid==4
+        any where source.ip >= "1.1.1.1"
         """
-    timestamp_key = "timestamp"
+    timestamp_key = "@timestamp"
     result = eql_search.search(data, query, timestamp_key)
     if result:
-        print(result)
+        print(json.dumps(result))

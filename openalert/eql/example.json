@@ -7,7 +7,7 @@
         "timestamp": 131485996510000000,
         "event_type": "network",
         "parent_process_name": "System Idle Process",
-        "pid": 4,
+        "@pid": 4,
         "process_name": "System",
         "subtype": "create",
         "user": "NT AUTHORITY\\SYSTEM",
@@ -24,6 +24,7 @@
     },
     {
         "command_line": "wininit.exe",
+        "@timestamp": "2021-08-30T12:00:00.000Z",
         "event_type": "process",
         "md5": "94355c28c1970635a31b3fe52eb7ceba",
         "pid": 424,
@@ -38,6 +39,7 @@
     },
     {
         "command_line": "winlogon.exe",
+        "@timestamp": "2021-08-29T12:00:00.000Z",
         "event_type": "process",
         "md5": "1151b1baa6f350b1db6598e0fea7c457",
         "pid": 472,

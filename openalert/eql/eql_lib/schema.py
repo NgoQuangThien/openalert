@@ -10,7 +10,7 @@ EVENT_TYPE_ANY = 'any'
 EVENT_TYPE_GENERIC = 'generic'
 
 MIXED_TYPES = TypeHint.Unknown.value
-IDENT_RE = re.compile(r"^[_a-zA-Z][a-zA-Z0-9_]*$")
+IDENT_RE = re.compile(r"^(@timestamp|[_a-zA-Z][a-zA-Z0-9_]*)$")
 
 
 is_primitive = set(b.value for b in TypeHint.primitives()).__contains__

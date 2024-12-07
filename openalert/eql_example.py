@@ -1,7 +1,7 @@
 import json
 import sys
 from pprint import pprint
-import eql_lib as eql
+import eql
 
 class EQLSearch:
     def _create_events(self, data, timestamp_key) -> list:
@@ -86,11 +86,11 @@ class EQLSearch:
 if __name__ == "__main__":
     eql_search = EQLSearch()
  
-    with open('example.json', 'r') as json_data:
+    with open('eql_data_sample.json', 'r') as json_data:
         data = json.load(json_data)
  
     query = r"""
-        any where source.ip >= "1.1.1.1"
+        any where @timestamp >= "2021-08-31"
         """
     timestamp_key = "@timestamp"
     result = eql_search.search(data, query, timestamp_key)

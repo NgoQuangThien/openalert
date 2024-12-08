@@ -8,5 +8,5 @@ git submodule update --init --recursive
 
 ### Update submodule 
 ```
-git submodule update --remote --recursive
+git submodule update --remote
 ```

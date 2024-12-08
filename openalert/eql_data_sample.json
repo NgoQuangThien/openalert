@@ -7,7 +7,7 @@
         "timestamp": 131485996510000000,
         "event_type": "network",
         "parent_process_name": "System Idle Process",
-        "@pid": 4,
+        "pid": 3,
         "process_name": "System",
         "subtype": "create",
         "user": "NT AUTHORITY\\SYSTEM",

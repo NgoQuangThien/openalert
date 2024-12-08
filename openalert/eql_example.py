@@ -3,8 +3,14 @@ import sys
 from pprint import pprint
 import eql
 
+
+DEFAULT_DATE_PATTERNS = ['%Y-%m-%dT%H:%M:%S.%fZ']
+DEFAULT_EVENT_TYPE = "event.category"
+DEFAULT_TIMESTAMP = "@timestamp"
+
+
 class EQLSearch:
-    def _create_events(self, data, timestamp_key) -> list:
+    def _create_events(self, data, event_type_key, timestamp_key, date_patterns) -> list:
         """
         Create EQL Events from the provided data.
         :param data: list of dictionaries to be transformed to EQL Events
@@ -14,19 +20,12 @@ class EQLSearch:
         eql_events = list()
 
         # create EQL Events from 'data'
-        for item in data:
-            if "event" in item and "category" in item["event"]:
-                event_type = item["event"]["category"]
-            else:
-                event_type = "generic"
+        for event_data in data:
+            event_type = eql.utils.get_event_type(event_data, event_type_key)
+            event_time = eql.utils.get_event_time(event_data, timestamp_key, date_patterns)
 
-            if timestamp_key in item:
-                timestamp_value = item[timestamp_key]
-            else:
-                timestamp_value = 0
+            eql_events.append(eql.Event(event_type, event_time, event_data))
 
-            eql_events.append(eql.Event(event_type, timestamp_value, item))
-        
         return eql_events
 
 
@@ -65,7 +64,7 @@ class EQLSearch:
         return query_result
 
 
-    def search(self, data, query, timestamp_key) -> list:
+    def search(self, data, query, event_type_key=DEFAULT_EVENT_TYPE, timestamp_key=DEFAULT_TIMESTAMP, date_patterns=DEFAULT_DATE_PATTERNS) -> list:
         """
         Perform a EQL search on the provided JSON or YAML data.
         :param data: list of dictionaries
@@ -75,7 +74,7 @@ class EQLSearch:
         """
 
         # transform data into a list of EQL Event objects
-        eql_events = self._create_events(data, timestamp_key)
+        eql_events = self._create_events(data, event_type_key, timestamp_key, date_patterns)
  
         # execute the EQL query on the provided data
         search_result = self._execute_query(eql_events, query)
@@ -90,9 +89,9 @@ if __name__ == "__main__":
         data = json.load(json_data)
  
     query = r"""
-        any where @timestamp >= "2021-08-31"
+        network where pid == 3
         """
-    timestamp_key = "@timestamp"
-    result = eql_search.search(data, query, timestamp_key)
+
+    result = eql_search.search(data, query)
     if result:
         print(json.dumps(result))

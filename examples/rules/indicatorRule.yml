@@ -1,0 +1,108 @@
+id: cbcb94e7-efee-4854-85b1-10fc61abe912
+name: Detects data encoding in network traffic
+description: |
+  Detects data encoding in network traffic
+references:
+  - reference 1
+tags:
+  - tags 1
+author:
+  - ThienNQ
+  - VietPD
+enabled: false
+status: experimental  # experimental, test, stable
+date: 2024/12/01
+modified: 2024/12/01
+
+index:
+  - cmccs-*
+fields:
+  includes:
+    - source.ip
+    - destination.ip
+  excludes:
+    - host.mac
+
+type: indicator
+indicator:
+  index: malicious-ip
+  filter:
+    bool:
+      filter:
+        - match_phrase:
+            data_stream.dataset: logs
+  mapping:
+    - entries:
+      - field: data_stream.dataset
+        type: mapping
+        value: data_stream.dataset
+    - entries:
+        - field: data_stream.namespace
+          type: mapping
+          value: data_stream.namespace
+        - field: data_stream.type
+          type: mapping
+          value: data_stream.type
+    - entries:
+        - field: destination.ip
+          type: mapping
+          value: destination.ip
+
+filter: # đặt trong phần filter của query
+  bool:
+    must:
+    - query_string:
+        query: 'data_stream.type: logs'
+        analyze_wildcard: true
+        time_zone: Asia/Saigon
+exceptions: # đặt trong phần must_not của query
+  - name: exception 1
+    description: |
+      Exception 1 description
+    filter:
+      bool:
+        must_not:
+          - match_phrase:
+              data_stream.dataset: error
+exceptionslist:
+  - 6e7b1670-a83a-4e89-a151-63a3d4277292
+
+riskscore: 50 # 0-100
+severity: low # informational, low, medium, high, critical
+
+falsepositives:
+  - falsepositives 1
+
+# time range: from "[now - (interval + buffer_time)]" to "now"
+schedule:  # s, m, h
+  interval: 5m
+  buffer_time: 1m
+
+maxsignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
+threat:
+  - framework: MITRE ATT&CK
+    tactic:
+      id: TA0011
+      name: Command and Control
+      reference: https://attack.mitre.org/tactics/TA0011/
+    technique:
+    - id: T1132
+      name: Data Encoding
+      reference: https://attack.mitre.org/techniques/T1132/
+      subtechnique:
+      - id: T1132.002
+        name: Non-Standard Encoding
+        reference: https://attack.mitre.org/techniques/T1132/002/
+
+actions:
+#   - email
+
+# email:
+#   to:
+#     - "user1@gmail.com"
+#   cc:
+#     - "cc1@gmail.com"
+#   bcc:
+#     - "bcc1@gmail.com"
+#   subject: "Alert"
+#   body: "Alert"

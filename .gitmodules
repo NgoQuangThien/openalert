@@ -1,0 +1,6 @@
+[submodule "dependencies/pySigma"]
+	path = dependencies/pySigma
+	url = https://github.com/NgoQuangThien/pySigma.git
+[submodule "dependencies/eql"]
+	path = dependencies/eql
+	url = https://github.com/NgoQuangThien/eql.git

@@ -1,0 +1,13 @@
+id: 6e7b1670-a83a-4e89-a151-63a3d4277292
+name: exceptions list 1
+description: |
+  Exception description
+exceptions: # đặt trong phần must_not của query
+  - name: exception 1
+    description: |
+      Exception 1 description
+    filter:
+      bool:
+        must_not:
+          - match_phrase:
+              data_stream.dataset: error

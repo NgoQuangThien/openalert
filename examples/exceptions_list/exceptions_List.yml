@@ -1,6 +1,7 @@
 name: Filter Out Administrator accounts
 description: Filters out administrator accounts
 id: d84c0ded-edd7-4123-80ed-348bb3ccc444
+
 exceptions:
   - name: exception 1
       condition_1:

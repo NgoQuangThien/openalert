@@ -6,37 +6,38 @@ references:
   - reference 1
 tags:
   - tags 1
-author: ThienNQ
+author: 
+  - ThienNQ
 enabled: false
 status: experimental  # experimental, test, stable
 date: 2023-01-01
 modified: 2023-01-02
 
-type: query
 index:
   - cmccs-*
+
+query:
+  query_1:
+    - data_stream.type: "logs"
+  condition: query_1
+
+exceptions:
+  - name: exception 1
+    condition_1:
+      data_stream.dataset: "nginx.access"
+    condition: condition_1
+
+exceptionslist:
+  - d84c0ded-edd7-4123-80ed-348bb3ccc444
+
 fields:
   includes:
     - source.ip
     - destination.ip
   excludes:
     - host.mac
-detection:
-  detection_1:
-    - data_stream.type: "logs"
-  detection_2:
-    - data_stream.dataset: "nginx.access"
-  condition: detection_1
 
-filter:
-  filter_1:
-    data_stream.dataset: "nginx.access"
-  filter_2:
-    data_stream.namespace: "default"
-  condition: not all of filter_*
 
-filterslist:
-  - 6e7b1670-a83a-4e89-a151-63a3d4277292
 
 riskscore: 50 # 0-100
 severity: low # informational, low, medium, high, critical
@@ -50,6 +51,7 @@ schedule:  # s, m, h
   buffer_time: 1m
 
 maxsignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
+
 threat:
   - framework: MITRE ATT&CK
     tactic:
@@ -66,14 +68,13 @@ threat:
         reference: https://attack.mitre.org/techniques/T1132/002/
 
 actions:
-#   - email
-
-# email:
-#   to:
-#     - "user1@gmail.com"
-#   cc:
-#     - "cc1@gmail.com"
-#   bcc:
-#     - "bcc1@gmail.com"
-#   subject: "Alert"
-#   body: "Alert"
+  - email
+      enabled: true
+      to:
+        - "user1@gmail.com"
+      cc:
+        - "cc1@gmail.com"
+      bcc:
+        - "bcc1@gmail.com"
+      subject: "Alert"
+      body: "Alert"

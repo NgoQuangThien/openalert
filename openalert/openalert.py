@@ -23,7 +23,11 @@ class OpenAlert(object):
 
     def __init__(self, args):
         self.parse_args(args)
-        # print(self.args)
+        self.debug = self.args.debug
+
+        if self.debug:
+            openalert_logger.info("Note: In debug mode, alerts will be logged to console but NOT actually sent.")
+
         self.config = load_config(self.args)
 
 

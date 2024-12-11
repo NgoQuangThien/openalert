@@ -47,7 +47,7 @@ logging:
 
   loggers:
     OpenAlert:
-      level: DEBUG
+      level: WARNING
       handlers:
         - console
         - file

@@ -17,9 +17,9 @@ index:
   - cmccs-*
 
 query:
-  query_1:
+  condition_1:
     - data_stream.type: "logs"
-  condition: query_1
+  condition: condition_1
 
 exceptions:
   - name: exception 1
@@ -27,7 +27,7 @@ exceptions:
       data_stream.dataset: "nginx.access"
     condition: condition_1
 
-exceptionslist:
+exceptionsList:
   - d84c0ded-edd7-4123-80ed-348bb3ccc444
 
 fields:
@@ -37,20 +37,18 @@ fields:
   excludes:
     - host.mac
 
-
-
 riskscore: 50 # 0-100
 severity: low # informational, low, medium, high, critical
 
-falsepositives:
-  - falsepositives 1
+falsePositives:
+  - falsePositives 1
 
 # time range: from "[now - (interval + buffer_time)]" to "now"
 schedule:  # s, m, h
   interval: 5m
   buffer_time: 1m
 
-maxsignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
+maxSignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
 
 threat:
   - framework: MITRE ATT&CK
@@ -62,7 +60,7 @@ threat:
     - id: T1132
       name: Data Encoding
       reference: https://attack.mitre.org/techniques/T1132/
-      subtechnique:
+      subTechnique:
       - id: T1132.002
         name: Non-Standard Encoding
         reference: https://attack.mitre.org/techniques/T1132/002/

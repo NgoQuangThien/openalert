@@ -24,22 +24,29 @@ logging:
   version: 1
   incremental: false
   disable_existing_loggers: false
+
   formatters:
     default:
+      format: '%(asctime)s [%(levelname)+8s] %(name)+18s %(message)s'
+      datefmt: '%Y-%m-%d %H:%M:%S'
+    logline:
       format: '%(asctime)s [%(levelname)s] %(name)s %(message)s'
+      datefmt: '%Y-%m-%d %H:%M:%S'
+
   handlers:
     console:
-        class: logging.StreamHandler
-        formatter: default
-        level: DEBUG
-        stream: ext://sys.stderr
-    file:
-      class : logging.FileHandler
+      class: logging.StreamHandler
       formatter: default
-      level: WARN
+      level: DEBUG
+      stream: ext://sys.stderr
+    file:
+      class: logging.FileHandler
+      formatter: logline
+      level: INFO
       filename: openalert.log
+
   loggers:
-    openalert:
+    OpenAlert:
       level: DEBUG
       handlers:
         - console

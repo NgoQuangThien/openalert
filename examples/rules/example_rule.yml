@@ -68,7 +68,7 @@ threat:
         reference: https://attack.mitre.org/techniques/T1132/002/
 
 actions:
-  - email
+  - email:
       enabled: true
       to:
         - "user1@gmail.com"

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/product.schema.json",
+  "title": "CMCCS SIEM rule specification V1.0.0 (2024-12-11)",
+  "description": "Schema of rule in Log Correlation module",
+  "type": "object",
+  "required": ["id", "name", "query"],
+  "properties":{
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string"
+    },
+    "query": {
+      "type": "object",
+      "required": ["condition"],
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "object",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "object",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "properties": {
+          "condition": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

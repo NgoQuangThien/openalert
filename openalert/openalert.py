@@ -35,11 +35,11 @@ class OpenAlert(object):
         openalert_logger.info('Starting OpenAlert...')
         openalert_logger.info('OpenAlert is running')
         while True:
-            break
+            continue
 
 
 def handle_signal(signal, frame):
-    openalert_logger.info('SIGINT received, stopping ElastAlert...')
+    openalert_logger.info('SIGINT received, stopping OpenAlert...')
     # use os._exit to exit immediately and avoid someone catching SystemExit
     os._exit(0)
 

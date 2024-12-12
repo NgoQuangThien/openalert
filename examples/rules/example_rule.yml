@@ -1,6 +1,6 @@
 id: cbcb94e7-efee-4854-85b1-10fc61abe912
 name: Detects data encoding in network traffic
-description: |
+description: >-
   Detects data encoding in network traffic
 references:
   - reference 1
@@ -8,7 +8,7 @@ tags:
   - tags 1
 author: 
   - ThienNQ
-enabled: false
+enabled: true
 status: experimental  # experimental, test, stable
 date: 2023-01-01
 modified: 2023-01-02
@@ -17,17 +17,18 @@ index:
   - cmccs-*
 
 query:
-  query_1:
+  selection_1:
     - data_stream.type: "logs"
-  condition: query_1
+  condition: selection_1
 
 exceptions:
   - name: exception 1
-    condition_1:
+    description: Description for exception 1
+    selection_1:
       data_stream.dataset: "nginx.access"
-    condition: condition_1
+    condition: selection_1
 
-exceptionslist:
+exceptionsList:
   - d84c0ded-edd7-4123-80ed-348bb3ccc444
 
 fields:
@@ -37,20 +38,41 @@ fields:
   excludes:
     - host.mac
 
+enhancements:
+  - eql: true
+    query: >-
+      any where true
+
+  - indicatorMatch: false
+    index:
+      - cmccs-logs-context.management-default
+    query:
+      selection_1:
+        - data_stream.type: "logs"
+      condition: selection_1
+    mapping: # Các entries => OR với nhau. Trong cùng entries => AND
+      - entries:
+          - field: data_stream.type
+            value: datastream_type
+          - field: source.ip
+            value: src_ip
+      - entries:
+          - field: destination.ip
+            value: dst_ip
 
 
-riskscore: 50 # 0-100
+riskScore: 50 # 0-100
 severity: low # informational, low, medium, high, critical
 
-falsepositives:
-  - falsepositives 1
+falsePositives:
+  - falsePositives 1
 
 # time range: from "[now - (interval + buffer_time)]" to "now"
 schedule:  # s, m, h
   interval: 5m
-  buffer_time: 1m
+  bufferTime: 1m
 
-maxsignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
+maxSignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
 
 threat:
   - framework: MITRE ATT&CK
@@ -62,13 +84,13 @@ threat:
     - id: T1132
       name: Data Encoding
       reference: https://attack.mitre.org/techniques/T1132/
-      subtechnique:
+      subTechnique:
       - id: T1132.002
         name: Non-Standard Encoding
         reference: https://attack.mitre.org/techniques/T1132/002/
 
 actions:
-  - email
+  - email:
       enabled: true
       to:
         - "user1@gmail.com"
@@ -78,3 +100,5 @@ actions:
         - "bcc1@gmail.com"
       subject: "Alert"
       body: "Alert"
+
+license: "CMCCS license 1.0"

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/product.schema.json",
+  "title": "CMCCS SIEM rule-exception specification V1.0.0 (2024-12-12)",
+  "description": "Schema of rule-exception in Log Correlation module",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "exceptions"
+  ],
+  "$defs": {
+    "complexValue": {
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "integer" },
+              {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "uuidType": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/uuidType"
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 65535
+    },
+    "exceptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "condition"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "condition": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/$defs/complexValue"
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+}

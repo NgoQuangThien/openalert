@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/product.schema.json",
+  "title": "CMCCS SIEM rule-exception specification V1.0.0 (2024-12-12)",
+  "description": "Config schema in Log Correlation module",
+  "type": "object",
+  "properties": {
+    "opensearch": {
+      "type": "object",
+      "properties": {
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "ssl": {
+          "type": "object",
+          "properties": {
+            "certificate": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            },
+            "certificateAuthorities": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            },
+            "verificationMode": {
+              "type": "string",
+              "enum": ["none", "certificate", "full"]
+            }
+          },
+          "required": ["verificationMode"]
+        },
+        "timeout": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "writeBack": {
+          "type": "string"
+        }
+      },
+      "required": ["hosts", "username", "password", "ssl", "writeBack"]
+    },
+    "rules": {
+      "type": "object",
+      "properties": {
+        "rulesFolder": {
+          "type": "string"
+        },
+        "exceptionsFolder": {
+          "type": "string"
+        },
+        "schedule": {
+          "type": "object",
+          "properties": {
+            "interval": {
+              "type": "string"
+            },
+            "bufferTime": {
+              "type": "string"
+            }
+          },
+          "required": ["interval", "bufferTime"]
+        },
+        "maxSignals": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": ["rulesFolder", "exceptionsFolder"]
+    },
+    "logging": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        },
+        "handlers": {
+          "type": "object",
+          "properties": {
+            "console": {
+              "type": "object",
+              "properties": {
+                "stream": {
+                  "type": "string",
+                  "pattern": "^ext://"
+                }
+              },
+              "required": ["stream"]
+            },
+            "file": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string"
+                },
+                "keepFiles": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": ["filename", "keepFiles"]
+            }
+          },
+          "required": ["console", "file"]
+        }
+      },
+      "required": ["level", "handlers"]
+    }
+  },
+  "required": ["opensearch", "rules"]
+}

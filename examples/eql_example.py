@@ -89,7 +89,7 @@ if __name__ == "__main__":
         data = json.load(json_data)
  
     query = r"""
-        network where pid == 3
+        any where true
         """
 
     result = eql_search.search(data, query)

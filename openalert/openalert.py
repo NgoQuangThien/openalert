@@ -2,37 +2,20 @@ import argparse
 import os
 import signal
 import sys
+
 from config import load_config
-from logger import openalert_logger
+from logger import openalert_logger, configure_logging
 
 
 class OpenAlert(object):
-    def parse_args(self, args):
-        parser = argparse.ArgumentParser()
-        
-        parser.add_argument(
-            '--config',
-            action='store',
-            dest='config',
-            help='Global config file (default: config.yaml)')
-        
-        parser.add_argument('--debug', action='store_true', dest='debug', help='Suppresses alerts and prints information instead.')
-
-        self.args = parser.parse_args(args)
-
-
     def __init__(self, args):
-        self.parse_args(args)
+        self.args = args
         self.debug = self.args.debug
 
         if self.debug:
             openalert_logger.info("Note: In debug mode, alerts will be logged to console but NOT actually sent.")
 
-        self.config = load_config(self.args)
-
-
     def start(self):
-        openalert_logger.info('Starting OpenAlert...')
         openalert_logger.info('OpenAlert is running')
         while True:
             continue
@@ -49,8 +32,27 @@ def main(args=None):
     if not args:
         args = sys.argv[1:]
 
-    module = OpenAlert(args)
-    module.start()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '--config',
+        action='store',
+        default='config.yaml',
+        dest='config',
+        help='Global config file (default: config.yaml)')
+    parser.add_argument('--debug',
+                        action='store_true',
+                        dest='debug',
+                        help='Suppresses alerts and prints information instead (default: False)')
+    args = parser.parse_args(args)
+
+    config = load_config(args.config, "./schema/config-schema.json")
+
+    configure_logging(config)
+    openalert_logger.info('Config load complete')
+    openalert_logger.info('Starting OpenAlert...')
+
+    open_alert = OpenAlert(args)
+    open_alert.start()
 
 
 if __name__ == '__main__':

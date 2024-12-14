@@ -85,10 +85,6 @@
     "logging": {
       "type": "object",
       "properties": {
-        "level": {
-          "type": "string",
-          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-        },
         "handlers": {
           "type": "object",
           "properties": {
@@ -97,29 +93,40 @@
               "properties": {
                 "stream": {
                   "type": "string",
-                  "pattern": "^ext://"
+                  "enum": [
+                    "stdout",
+                    "stderr"
+                  ]
+                },
+                "level": {
+                  "type": "string",
+                  "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
                 }
               },
-              "required": ["stream"]
+              "required": ["stream", "level"]
             },
             "file": {
               "type": "object",
               "properties": {
-                "filename": {
+                "path": {
                   "type": "string"
                 },
                 "keepFiles": {
                   "type": "integer",
                   "minimum": 0
+                },
+                "level": {
+                  "type": "string",
+                  "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
                 }
               },
-              "required": ["filename", "keepFiles"]
+              "required": ["path", "keepFiles", "level"]
             }
           },
           "required": ["console", "file"]
         }
       },
-      "required": ["level", "handlers"]
+      "required": ["handlers"]
     }
   },
   "required": ["opensearch", "rules"]

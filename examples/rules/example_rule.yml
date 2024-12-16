@@ -1,0 +1,103 @@
+id: cbcb94e7-efee-4854-85b1-10fc61abe912
+name: Detects data encoding in network traffic
+description: >-
+  Detects data encoding in network traffic
+references:
+  - reference 1
+tags:
+  - tags 1
+author: 
+  - ThienNQ
+enabled: true
+status: experimental  # experimental, test, stable
+date: 2023-01-01
+modified: 2023-01-02
+
+index:
+  - cmccs-*
+
+query:
+  selection_1:
+    - data_stream.type: "logs"
+  condition: selection_1
+
+exceptions:
+  - name: exception 1
+    description: Description for exception 1
+    selection_1:
+      data_stream.dataset: "nginx.access"
+    condition: selection_1
+
+exceptionsList:
+  - d84c0ded-edd7-4123-80ed-348bb3ccc444
+
+fields:
+  includes:
+    - source.ip
+    - destination.ip
+  excludes:
+    - host.mac
+
+enhancements:
+  - eql: true
+    query: >-
+      any where true
+
+  - indicatorMatch: false
+    index:
+      - cmccs-logs-context.management-default
+    query:
+      selection_1:
+        - data_stream.type: "logs"
+      condition: selection_1
+    mapping: # Các entries => OR với nhau. Trong cùng entries => AND
+      - entries:
+          - field: data_stream.type
+            value: datastream_type
+          - field: source.ip
+            value: src_ip
+      - entries:
+          - field: destination.ip
+            value: dst_ip
+
+riskScore: 20 # 0-100
+severity: low # informational, low, medium, high, critical
+
+falsePositives:
+  - falsePositives 1
+
+# time range: from "[now - (interval + buffer_time)]" to "now"
+schedule:  # s, m, h
+  interval: 5m
+  bufferTime: 1m
+
+maxSignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
+
+threat:
+  - framework: MITRE ATT&CK
+    tactic:
+      id: TA0011
+      name: Command and Control
+      reference: https://attack.mitre.org/tactics/TA0011/
+    technique:
+    - id: T1132
+      name: Data Encoding
+      reference: https://attack.mitre.org/techniques/T1132/
+      subTechnique:
+      - id: T1132.002
+        name: Non-Standard Encoding
+        reference: https://attack.mitre.org/techniques/T1132/002/
+
+actions:
+  - email:
+      enabled: true
+      to:
+        - "user1@gmail.com"
+      cc:
+        - "cc1@gmail.com"
+      bcc:
+        - "bcc1@gmail.com"
+      subject: "Alert"
+      body: "Alert"
+
+license: "CMCCS license 1.0"

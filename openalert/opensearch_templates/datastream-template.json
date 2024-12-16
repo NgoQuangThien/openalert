@@ -1,0 +1,90 @@
+PUT _index_template/cmccs-logs-security.alert-default
+{
+  "index_patterns": [
+    "cmccs-logs-security.alert-default"
+  ],
+  "template": {
+    "settings": {
+      "index.number_of_shards": "1",
+      "index.number_of_replicas": "0",
+      "index.refresh_interval": "5s"
+    },
+    "mappings": {
+      "dynamic_templates": [
+        {
+          "ip_address": {
+            "path_match": "*.ip",
+            "match_mapping_type": "string",
+            "mapping": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 45,
+                  "type": "keyword"
+                }
+              },
+              "type": "ip"
+            }
+          }
+        },
+        {
+          "port": {
+            "path_match": "*.port",
+            "path_unmatch": "*.data.port",
+            "mapping": {
+              "fields": {
+                "keyword": {
+                  "ignore_above": 6,
+                  "type": "keyword"
+                }
+              },
+              "type": "integer"
+            }
+          }
+        },
+        {
+          "strings": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "keyword"
+            }
+          }
+        },
+        {
+          "strings_as_keyword": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        }
+      ],
+      "properties": {
+        "@timestamp": {
+          "type": "date"
+        },
+        "datastream_type": {
+          "type": "constant_keyword",
+          "value": "logs"
+        },
+        "datastream_dataset": {
+          "type": "constant_keyword",
+          "value": "security.alert"
+        },
+        "datastream_namespace": {
+          "type": "constant_keyword",
+          "value": "default"
+        }
+      }
+    },
+    "aliases": {
+      "cmccs": {}
+    }
+  },
+  "priority": "0",
+  "data_stream": {
+    "timestamp_field": {
+      "name": "@timestamp"
+    }
+  }
+}

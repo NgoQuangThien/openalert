@@ -6,11 +6,14 @@ from logger import openalert_logger
 
 
 def get_all_files(folder):
-    files = []
-    for filename in os.listdir(folder):
-        file_path = os.path.join(folder, filename)
-        if os.path.isfile(file_path):
-            files.append(file_path)
+    files = list()
+    try:
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
+            if os.path.isfile(file_path):
+                files.append(file_path)
+    except Exception as e:
+        openalert_logger.error(f'Error accessing folder {folder}: {e}')
 
     return files
 
@@ -64,8 +67,11 @@ class RulesLoader(Loader):
 
 
     def load_all(self) -> dict:
+        if not os.path.isdir(self.folder):
+            raise Exception(f'{self.folder} is not a directory.')
+
         for file in get_all_files(self.folder):
-            if file.endswith('.yml'):
+            if file.endswith(('.yml', '.yaml')):
                 openalert_logger.info(f'Loading file: {file}')
                 rule_content = self.load(file)
                 if rule_content:
@@ -79,19 +85,26 @@ class ExceptionsLoader(Loader):
         super().__init__(folder, schema_path)
         self.exceptions = dict()
 
-
-    def validate_schema(self, file_content) -> bool:
-        pass
-
-
-    def load(self, file_path) -> dict:
-        pass
-
     def load_all(self) -> dict:
-        pass
+        if not os.path.isdir(self.folder):
+            raise Exception(f'{self.folder} is not a directory.')
+
+        for file in get_all_files(self.folder):
+            if file.endswith('.yml'):
+                openalert_logger.info(f'Loading file: {file}')
+                rule_content = self.load(file)
+                if rule_content:
+                    self.exceptions[file] = rule_content
+
+        return self.exceptions
 
 
-rule_folder = '/Users/admin/DEV/openalert/examples/rules'
-rules_loader = RulesLoader(rule_folder, os.path.join(os.path.dirname(__file__),'schema/rule-schema.json'))
-rules = rules_loader.load_all()
-print(rules)
+# rule_folder = 'D:/DEV/Python/openalert/examples/rules/'
+# rule_loader = RulesLoader(rule_folder, os.path.join(os.path.dirname(__file__),'schema/rule-schema.json'))
+# rules = rule_loader.load_all()
+# print(rules)
+#
+# exception_folder = 'D:/DEV/Python/openalert/examples/exceptions/'
+# exception_loader = RulesLoader(rule_folder, os.path.join(os.path.dirname(__file__),'schema/rule-schema.json'))
+# exceptions = exception_loader.load_all()
+# print(exceptions)

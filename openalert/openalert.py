@@ -5,12 +5,39 @@ import sys
 
 from config import load_config
 from logger import openalert_logger, configure_logging
+from loader import RulesLoader, ExceptionsLoader
 
+
+work_dir = os.path.dirname(__file__)
 
 class OpenAlert(object):
     def __init__(self, config):
         self.conf = config
         self.debug = config.get("debug")
+
+        if self.debug:
+            openalert_logger.info("In debug mode, alerts will be logged to console but NOT actually sent.")
+
+        self.opensearch_hosts = config['opensearch']['hosts']
+        self.opensearch_user = config['opensearch']['username']
+        self.opensearch_password = config['opensearch']['password']
+
+        self.opensearch_ssl_verificationMode = config['opensearch']['ssl']['verificationMode']
+        self.opensearch_ssl_certificate= config['opensearch']['ssl']['certificate']
+        self.opensearch_ssl_key= config['opensearch']['ssl']['key']
+        self.opensearch_ssl_certificateAuthorities = config['opensearch']['ssl']['certificateAuthorities']
+
+        self.opensearch_timeout = config['opensearch'].get('timeout', 30000)
+        self.writeBackIndex = config['opensearch']['writeBack']
+
+        self.rulesFolder = config['rule']['rulesFolder']
+        self.exceptionsFolder = config['rule']['exceptionsFolder']
+        self.maxSignals = config['rule']['maxSignals']
+        self.interval = config['rule']['schedule']['interval']
+        self.bufferTime = config['rule']['schedule']['bufferTime']
+
+        self.rules = RulesLoader(self.rulesFolder, os.path.join(work_dir,'schema/rule-schema.json')).load_all()
+        self.exceptions = ExceptionsLoader(self.exceptionsFolder, os.path.join(work_dir,'schema/exception-schema.json')).load_all()
 
 
     def start(self):

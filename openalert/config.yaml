@@ -3,16 +3,16 @@ opensearch:
   username: "admin"
   password: "ab@AB@123"
   ssl:
+    verificationMode: none  # To disregard the validity of SSL certificates, change this setting's value to 'none'.
     certificate: /path/to/your/client.crt
     key: /path/to/your/client.key
     certificateAuthorities: [ "/path/to/your/CA.pem" ]
-    verificationMode: none  # To disregard the validity of SSL certificates, change this setting's value to 'none'.
   timeout: 30000
   writeBack: cmccs-logs-security.alert-default
 
-rules:
-  rulesFolder: examples/rules
-  exceptionsFolder: examples/exceptions
+rule:
+  rulesFolder: D:/DEV/Python/openalert/examples/rules
+  exceptionsFolder: D:/DEV/Python/openalert/examples/exceptions
   schedule: # s, m, h
     interval: 5m
     bufferTime: 1m

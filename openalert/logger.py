@@ -39,7 +39,10 @@ def configure_logging(conf):
         file_handler.setLevel(conf['logging']['handlers']['file']['level'])
         file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(name)s %(message)s',
                                                         datefmt=date_format))
-        # Need code to process keepFiles in config
+
+        #########################################################
+        #   Need code to process keepFiles option in config.    #
+        #########################################################
 
 
     openalert_logger.addHandler(console_handler)

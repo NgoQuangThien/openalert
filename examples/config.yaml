@@ -10,7 +10,7 @@ opensearch:
   timeout: 30000
   writeBack: cmccs-logs-security.alert-default
 
-rules:
+rule:
   rulesFolder: examples/rules
   exceptionsFolder: examples/exceptions
   schedule: # s, m, h

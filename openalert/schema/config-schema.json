@@ -54,7 +54,7 @@
       },
       "required": ["hosts", "username", "password", "ssl", "writeBack"]
     },
-    "rules": {
+    "rule": {
       "type": "object",
       "properties": {
         "rulesFolder": {
@@ -129,5 +129,5 @@
       "required": ["handlers"]
     }
   },
-  "required": ["opensearch", "rules"]
+  "required": ["opensearch", "rule"]
 }

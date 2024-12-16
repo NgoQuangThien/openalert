@@ -1,0 +1,2 @@
+class OpenSearchClient(object):
+    pass

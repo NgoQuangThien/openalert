@@ -7,6 +7,3 @@ def read_yaml(path) -> dict:
         yaml_content = os.path.expandvars(f.read())
         return yaml.load(yaml_content, Loader=yaml.FullLoader)
 
-
-def dt_to_str(dt):
-    return dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ')

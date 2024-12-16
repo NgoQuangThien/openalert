@@ -60,7 +60,6 @@ enhancements:
           - field: destination.ip
             value: dst_ip
 
-
 riskScore: 20 # 0-100
 severity: low # informational, low, medium, high, critical
 

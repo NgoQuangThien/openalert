@@ -120,7 +120,7 @@
                   "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
                 }
               },
-              "required": ["path", "keepFiles", "level"]
+              "required": ["level"]
             }
           },
           "required": ["console", "file"]

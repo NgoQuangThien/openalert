@@ -8,17 +8,15 @@ from logger import openalert_logger, configure_logging
 
 
 class OpenAlert(object):
-    def __init__(self, args):
-        self.args = args
-        self.debug = self.args.debug
+    def __init__(self, config):
+        self.conf = config
+        self.debug = config.get("debug")
 
-        if self.debug:
-            openalert_logger.info("Note: In debug mode, alerts will be logged to console but NOT actually sent.")
 
     def start(self):
         openalert_logger.info('OpenAlert is running')
         while True:
-            continue
+            break
 
 
 def handle_signal(signal, frame):
@@ -36,7 +34,6 @@ def main(args=None):
     parser.add_argument(
         '--config',
         action='store',
-        default='config.yaml',
         dest='config',
         help='Global config file (default: config.yaml)')
     parser.add_argument('--debug',
@@ -45,14 +42,16 @@ def main(args=None):
                         help='Suppresses alerts and prints information instead (default: False)')
     args = parser.parse_args(args)
 
-    config = load_config(args.config, "./schema/config-schema.json")
+    config = load_config(args.config, "config-schema.json")
+    if args.debug:
+        config["debug"] = True
 
     configure_logging(config)
-    openalert_logger.info('Config load complete')
+    openalert_logger.info('Configuration successfully loaded')
     openalert_logger.info('Starting OpenAlert...')
 
-    open_alert = OpenAlert(args)
-    open_alert.start()
+    open_alert = OpenAlert(config)
+    # open_alert.start()
 
 
 if __name__ == '__main__':

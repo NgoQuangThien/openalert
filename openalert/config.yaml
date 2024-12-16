@@ -24,8 +24,8 @@ logging:
       stream: stderr  # stdout, stderr
       level: DEBUG
     file:
-      path: openalert.log
-      keepFiles: 7
+#      path: openalert.log
+#      keepFiles: 7
       level: INFO
 
 #  formatters:

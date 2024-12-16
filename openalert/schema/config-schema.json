@@ -24,6 +24,9 @@
         "ssl": {
           "type": "object",
           "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
             "certificate": {
               "type": "string"
             },
@@ -37,12 +40,11 @@
               },
               "minItems": 1
             },
-            "verificationMode": {
-              "type": "string",
-              "enum": ["none", "certificate", "full"]
+            "verifyCerts": {
+              "type": "boolean"
             }
           },
-          "required": ["verificationMode"]
+          "required": ["enabled"]
         },
         "timeout": {
           "type": "integer",

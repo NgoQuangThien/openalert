@@ -6,6 +6,7 @@ import sys
 from config import load_config
 from logger import openalert_logger, configure_logging
 from loader import RulesLoader, ExceptionsLoader
+from opensearch_client import OpenSearchClient
 
 
 work_dir = os.path.dirname(__file__)
@@ -18,17 +19,9 @@ class OpenAlert(object):
         if self.debug:
             openalert_logger.info("In debug mode, alerts will be logged to console but NOT actually sent.")
 
-        self.opensearch_hosts = config['opensearch']['hosts']
-        self.opensearch_user = config['opensearch']['username']
-        self.opensearch_password = config['opensearch']['password']
-
-        self.opensearch_ssl_verificationMode = config['opensearch']['ssl']['verificationMode']
-        self.opensearch_ssl_certificate= config['opensearch']['ssl']['certificate']
-        self.opensearch_ssl_key= config['opensearch']['ssl']['key']
-        self.opensearch_ssl_certificateAuthorities = config['opensearch']['ssl']['certificateAuthorities']
-
-        self.opensearch_timeout = config['opensearch'].get('timeout', 30000)
-        self.writeBackIndex = config['opensearch']['writeBack']
+        self.client = OpenSearchClient(config)
+        if not self.client.ping():
+            openalert_logger.error("OpenSearch is not available")
 
         self.rulesFolder = config['rule']['rulesFolder']
         self.exceptionsFolder = config['rule']['exceptionsFolder']

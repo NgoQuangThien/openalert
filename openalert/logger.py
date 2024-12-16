@@ -37,7 +37,7 @@ def configure_logging(conf):
         if 'path' in conf['logging']['handlers']['file']:
             file_handler = logging.FileHandler(conf['logging']['handlers']['file']['path'], mode="a", encoding="utf-8")
         file_handler.setLevel(conf['logging']['handlers']['file']['level'])
-        file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(name)s %(message)s',
+        file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s',
                                                         datefmt=date_format))
 
         #########################################################

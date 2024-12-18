@@ -1,5 +1,6 @@
 import os
 import yaml
+from datetime import datetime, timezone
 
 
 def read_yaml(path) -> dict:
@@ -17,3 +18,7 @@ def interval_to_seconds(interval: str) -> int:
         return int(interval[:-1]) * 60 * 60
     else:
         return 0
+
+def ts_now():
+    now = datetime.now(timezone.utc)
+    return now.isoformat()

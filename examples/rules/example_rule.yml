@@ -40,8 +40,7 @@ exceptionsList:
 
 fields:
   includes:
-    - source.ip
-    - destination.ip
+    - agent
   excludes:
     - host.mac
 

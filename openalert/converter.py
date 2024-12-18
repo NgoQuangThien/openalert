@@ -1,4 +1,6 @@
 import copy
+import json
+
 from sigma.collection import SigmaCollection
 from sigma.backends.elasticsearch.elasticsearch_lucene import LuceneBackend
 
@@ -10,6 +12,9 @@ QUERY = "query"
 BOOL = "bool"
 FILTER = "filter"
 MUST_NOT = "must_not"
+SOURCE = "_source"
+INCLUDES = "includes"
+EXCLUDES = "excludes"
 OPEN_SEARCH_QUERY = "OpenSearchQuery"
 
 # Generic Sigma Rule (unchanged)
@@ -23,7 +28,10 @@ generic_sigma_rule = {
     "detection": {}
 }
 
-pattern_query = {QUERY: {BOOL: {FILTER: [], MUST_NOT: []}}}
+pattern_query = {
+    SOURCE: {INCLUDES: [], EXCLUDES: []},
+    QUERY: {BOOL: {FILTER: [], MUST_NOT: []}}
+}
 
 
 class Converter(object):
@@ -59,6 +67,12 @@ class Converter(object):
         # Convert Query Section
         if not self.add_to_query(query[QUERY][BOOL][FILTER], rule["query"], FILTER):
             return {}
+
+        if 'fields' in rule:
+            if 'includes' in rule['fields']:
+                query[SOURCE][INCLUDES].extend(rule['fields']['includes'])
+            if 'excludes' in rule['fields']:
+                query[SOURCE][EXCLUDES].extend(rule['fields']['excludes'])
 
         # Convert Exceptions Section
         for exception in rule["exceptions"]:

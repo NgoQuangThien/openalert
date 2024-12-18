@@ -1,3 +1,5 @@
+import json
+
 from opensearchpy import OpenSearch
 
 
@@ -15,15 +17,3 @@ class OpenSearchClient(OpenSearch):
             ssl_show_warn=False,
             timeout=config['opensearch'].get('timeout', 30000),
         )
-
-
-    @staticmethod
-    def generation_msearch_body(rules):
-        msearch_body = None
-        for rule in rules:
-            # Metadata line (index)
-            msearch_body += f'{{"index": {rule["index"]}}}\n'
-            # Query line
-            msearch_body += f'{rule["query"]}\n'
-
-        return  msearch_body

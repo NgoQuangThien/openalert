@@ -2,22 +2,10 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import time
 
-
-class Watcher(FileSystemEventHandler):
-    def __init__(self, folder):
-        self.watched_folder = folder
+from openalert.rule import RuleManager
 
 
-    def on_created(self, event):
-        raise NotImplementedError
 
-
-    def on_deleted(self, event):
-        raise NotImplementedError
-
-
-    def on_modified(self, event):
-        raise NotImplementedError
 
 
 folder_to_watch = '/Users/admin/DEV/openalert/examples/rules'

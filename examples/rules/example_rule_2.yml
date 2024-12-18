@@ -1,5 +1,5 @@
-id: cbcb94e7-efee-4854-85b1-10fc61abe912
-name: Detects data encoding in network traffic
+id: abcd94e7-efee-4854-85b1-10fc61abe912
+name: test rule 2
 description: >-
   Detects data encoding in network traffic
 references:
@@ -27,15 +27,9 @@ exceptions:
     selection_1:
       data_stream.dataset: "test 1"
     condition: selection_1
-  - name: exception 2
-    description: Description for exception 2
-    selection_1:
-      data_stream.dataset: "test 2"
-    condition: selection_1
 
 exceptionsList:
   - d84c0ded-edd7-4123-80ed-348bb3ccc444
-  - 123c0ded-edd7-4123-80ed-348bb3ccc123
 
 fields:
   includes:
@@ -74,7 +68,7 @@ falsePositives:
 
 # time range: from "[now - (interval + buffer_time)]" to "now"
 schedule:  # s, m, h
-  interval: 1s
+  interval: 3m
   bufferTime: 1m
 
 maxSignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy

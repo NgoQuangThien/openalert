@@ -1,5 +1,5 @@
 id: d84c0ded-edd7-4123-80ed-348bb3ccc444
-name: Filter Out Administrator accounts
+name: Exception 1
 description: |
   Filters out administrator accounts
 
@@ -8,5 +8,12 @@ exceptions:
     description: |
       Description for exception 1
     selection_1:
-      data_stream.dataset: "nginx.access"
+      data_stream.dataset: "1"
+    condition: selection_1
+
+  - name: exception 2
+    description: |
+      Description for exception 1
+    selection_1:
+      data_stream.dataset: "2"
     condition: selection_1

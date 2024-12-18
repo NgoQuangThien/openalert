@@ -10,6 +10,7 @@ class BaseEnhancement(object):
         """ Modify the contents of match, a dictionary, in some way """
         raise NotImplementedError()
 
+
 class EQLEnhancement(BaseEnhancement):
     """ Enhancements that modify the match dictionary based on the EQL query that was matched """
     def process(self, match):

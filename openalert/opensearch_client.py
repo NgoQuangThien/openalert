@@ -15,7 +15,7 @@ class OpenSearchClient(OpenSearch):
             ssl_show_warn=False,
             timeout=config['opensearch'].get('timeout', 30000),
         )
-        self.writeBackIndex = config['opensearch']['writeBack']
+
 
     @staticmethod
     def generation_msearch_body(rules):

@@ -23,7 +23,7 @@ class OpenAlert(object):
         self.debug = config.get("debug", False)
 
         if self.debug:
-            openalert_logger.info("In debug mode, alerts will be logged to console but NOT actually sent.")
+            openalert_logger.info("DEBUG mode: ON. Alerts will be logged to console but NOT actually sent.")
 
         # Preparing folders
         self.rules_folder = config['rule']['rulesFolder']

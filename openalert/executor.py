@@ -6,9 +6,10 @@ from typing import Dict
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from rule import RuleManager
-from converter import Converter
+from converter import Converter, QUERY, BOOL, MUST_NOT
 from logger import openalert_logger
 from opensearch_client import OpenSearchClient
+from enhancements import EQLEnhancement, IndicatorMatchEnhancement
 from ultils import ts_now
 
 
@@ -29,9 +30,11 @@ MATCH = 'match'
 CREATED = 'created'
 
 pattern_alert = {
+    TIMESTAMP: '',
     METADATA: {INDEX: '', ID: ''},
-    RULE: {RULE_NAME: '', RULE_ID: '', RULE_DESCRIPTION: '', RISK_SCORE: 0, SEVERITY_LABEL: '', RULE_TAGS: [], RULE_THREAT: []},
-    EVENT:{TIMESTAMP: '', MATCH: {}}
+    RULE: {RULE_NAME: '', RULE_ID: '', RULE_DESCRIPTION: '',
+           RISK_SCORE: 0, SEVERITY_LABEL: '', RULE_TAGS: [], RULE_THREAT: []},
+    EVENT:{MATCH: {}}
 }
 
 
@@ -46,13 +49,16 @@ class Executor(RuleManager):
         self.bufferTime = config['rule']['schedule']['bufferTime']
         self.maxSignals = config['rule']['maxSignals']
 
-        self.scheduler = BackgroundScheduler()
-
         # jobs: { interval: job_id }
         self.jobs: Dict[int, str] = {}
         self.jobs_lock = threading.Lock()
+        self.scheduler = BackgroundScheduler()
 
-        openalert_logger.info('Pre-processing rules and exceptions...')
+        openalert_logger.info('Loading enhancer...')
+        self.enhancers = {}
+        self.load_enhancer()
+
+        openalert_logger.info('Pre-processing rules and exceptionsList...')
         self.preprocess()
 
 
@@ -60,29 +66,37 @@ class Executor(RuleManager):
         """Build OpenSearch query for Rule and ExceptionsList"""
         converter = Converter()
         # Get DSL_Lucene query from Rule
-        self.rules = converter.convert_all_rules(self.rules)
+        self.rules = converter.convert_all(self.rules, 'rules')
 
         # Get DSL_Lucene query from DisabledRule
-        self.disabled_rules = converter.convert_all_rules(self.disabled_rules)
+        self.disabled_rules = converter.convert_all(self.disabled_rules, 'rules')
 
         # Get DSL_Lucene query from ExceptionsList
-        self.exceptions = converter.convert_all_exceptions(self.exceptions)
+        self.exceptions = converter.convert_all(self.exceptions, 'exceptionsList')
 
         openalert_logger.info(r"Pre-processing completed. enabledRules: {}, exceptionsList: {}, disabledRules: {}".format(
             len(self.rules), len(self.exceptions), len(self.disabled_rules)))
 
 
-    def run_rule(self, rule, hits):
-        """Run a single rule."""
+    def load_enhancer(self):
+        """Load enhancer."""
+        self.enhancers['eql'] = EQLEnhancement()
+        self.enhancers['indicatorMatch'] = IndicatorMatchEnhancement()
+        openalert_logger.info(fr'Enhancer loaded successfully. Enhancers: {list(self.enhancers.keys())}')
+
+
+    @staticmethod
+    def _add_matches(rule, hits):
+        """Helper method to add match events to alerts."""
         alerts = []
         for hit in hits:
             if not hit['_source']:
                 continue
 
             alert = copy.deepcopy(pattern_alert)
+            alert[TIMESTAMP] = ts_now()
             alert[METADATA][INDEX] = hit['_index']
             alert[METADATA][ID] = hit['_id']
-            alert[EVENT][TIMESTAMP] = ts_now()
             alert[EVENT][MATCH] = hit['_source']
             alert[RULE][RULE_NAME] = rule['name']
             alert[RULE][RULE_ID] = rule['id']
@@ -96,33 +110,58 @@ class Executor(RuleManager):
         return alerts
 
 
+    def _add_exceptions_to_query(self, query: dict, exceptions_list: list):
+        """Helper method to add exceptions to a query's MUST_NOT clause."""
+        for exc_id in exceptions_list:
+            for exception in self.exceptions.values():
+                if exception['id'] != exc_id:
+                    continue
+                query_section = exception.get('OpenSearchQuery', {})
+                query[QUERY][BOOL][MUST_NOT].extend(
+                    query_section.get(QUERY, {}).get(BOOL, {}).get(MUST_NOT, [])
+                )
+
+
     def run_rule_group(self, interval: int):
         """Run all rules in a group."""
         rules = self.grouped_rules.get(interval, {})
 
-        # Generation OpenSearch m_search body
+        # Prepare OpenSearch multi-search body
         msearch_body = []
-        for filename, rule in rules.items():
-            msearch_body.extend(
-                [
-                    {"index": rule['index']},
-                    rule['OpenSearchQuery'],
-                ])
+        for rule in rules.values():
+            query = rule.get('OpenSearchQuery')
+
+            # Add exceptions to the query
+            if 'exceptionsList' in rule:
+                self._add_exceptions_to_query(query, rule['exceptionsList'])
+
+            # Add rule to the multi-search body
+            msearch_body.extend([
+                {"index": rule['index']},
+                query
+            ])
 
         # Get data from OpenSearch
         try:
             opensearch_data = self.client.msearch(msearch_body)
         except Exception as e:
-            openalert_logger.error(f"OpenSearch error: {e}")
+            openalert_logger.error(f"Cannot get data from OpenSearch. ERROR: {e}")
             return
 
         # Create alerts
         for index, (filename, rule) in enumerate(rules.items()):
             hits = opensearch_data['responses'][index]['hits']['hits']
-            alerts = self.run_rule(rule, hits)
+
+            # Should be use multi-thread for each rule
+            alerts = self._add_matches(rule, hits)
             if not alerts:
                 continue
-            print(json.dumps(alerts))
+
+            if 'enhancements' in rule:
+                # Run enhancements
+                for enhancement in rule['enhancements']:
+                    enhancer = next(iter(enhancement))
+                    self.enhancers[enhancer].process(alerts, enhancement[enhancer])
 
 
     def clean_empty_interval_job(self, interval: int):

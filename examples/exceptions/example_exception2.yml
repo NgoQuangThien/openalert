@@ -8,5 +8,5 @@ exceptions:
     description: |
       Description for exception 1
     selection_1:
-      data_stream.dataset: "test"
+      test: "test"
     condition: selection_1

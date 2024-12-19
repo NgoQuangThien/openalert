@@ -51,12 +51,13 @@ enhancements:
 
   - indicatorMatch:
       index:
-        - cmccs-logs-context.management-default
+        - cmccs-*
+        - logs-*
       query:
         selection_1:
           - data_stream.type: "logs"
         condition: selection_1
-      mapping: # Các entries => OR với nhau. Trong cùng entries => AND
+      mapping: # Các entries => OR với nhau. Trong cùng entries => AND với nhau
         - entries:
             - field: data_stream.type
               value: datastream_type

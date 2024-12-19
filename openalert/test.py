@@ -1,18 +1,92 @@
-import json
-
-
-alerts = [{"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "sYDqtJMB7K7i72bQ2itJ"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}}}}, {"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "toDqtJMB7K7i72bQ3itE"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}}}}, {"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "uoDqtJMB7K7i72bQ3ivi"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}, "@index": 2}}}, {"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "voDqtJMB7K7i72bQ3ytL"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}}}}, {"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "Auh03JMB8sX7qvLszQ7G"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}}}}, {"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "B-h03JMB8sX7qvLszw5O"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}}}}, {"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "C-h03JMB8sX7qvLs0Q4q"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}, "@index": 6}}}, {"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "D-h03JMB8sX7qvLs0g60"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}}}}, {"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "E-h03JMB8sX7qvLs1A5m"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}, "@index": 8}}}, {"@timestamp": "2024-12-19T08:28:30.198270+00:00", "metadata": {"_index": ".ds-cmccs-logs-nginx.access-default-000001", "_id": "F-h03JMB8sX7qvLs1g49"}, "rule": {"name": "Detects data encoding in network traffic", "id": "cbcb94e7-efee-4854-85b1-10fc61abe912", "description": "Detects data encoding in network traffic", "risk_score": 20, "severity_label": "low", "tags": ["tags 1"], "threat": [{"framework": "MITRE ATT&CK", "tactic": {"id": "TA0011", "name": "Command and Control", "reference": "https://attack.mitre.org/tactics/TA0011/"}, "technique": [{"id": "T1132", "name": "Data Encoding", "reference": "https://attack.mitre.org/techniques/T1132/", "subTechnique": [{"id": "T1132.002", "name": "Non-Standard Encoding", "reference": "https://attack.mitre.org/techniques/T1132/002/"}]}]}]}, "event": {"match": {"agent": {"hostname": "app-lms", "ip": "192.168.0.190", "name": "cmcuni-app-07-ecs-qldt", "id": "031", "type": "filebeat", "ephemeral_id": "8b536275-a3cc-4293-8668-8665048d0b88", "version": "7.17.15"}}}}]
-
-# alerts = [alert for alert in alerts if '@index' in alert['event']['match']]
-# alerts = [
-#     {**alert, "event": {**alert["event"], "match": {k: v for k, v in alert["event"]["match"].items() if k != "@index"}}}
-#     for alert in alerts
-#     if '@index' in alert['event']['match']
-# ]
-
-alerts = [
-    alert for alert in alerts
-    if '@index' in alert['event']['match'] and alert['event']['match'].pop('@index', None) is not None
+events = [
+    {
+        "event_number": 1,
+        "data_stream": {"type": "dns"},
+        "source": {"ip": "1.1.1.1"},
+        "destination": {"ip": "2.2.2.2"}
+    },
+    {
+        "event_number": 2,
+        "source": {"ip": "3.3.3.3"},
+        "destination": {"ip": "4.4.4.4"}
+    },
+    {
+        "event_number": 3,
+        "data_stream": {"type": "http"},
+        "destination": {"ip": "9.9.9.9"}
+    }
 ]
 
-print(json.dumps(alerts))
+indicators = [
+    {
+        "feed_type": "dns",
+        "src_ip": "1.1.1.1",
+        "dst_ip": "2.2.2.2",
+        "malicious_score": 90
+    },
+    {
+        "feed_type": "dns",
+        "src_ip": "5.5.5.5",
+        "dst_ip": "4.4.4.4",
+        "malicious_score": 70
+    },
+    {
+        "feed_type": "http",
+        "dst_ip": "9.9.9.9",
+        "malicious_score": 80
+    }
+]
+
+mapping = [
+    {
+        "entries": [
+            {"field": "data_stream.type", "value": "feed_type"},
+            {"field": "source.ip", "value": "src_ip"}
+        ]
+    },
+    {
+        "entries": [
+            {"field": "destination.ip", "value": "dst_ip"}
+        ]
+    }
+]
+
+
+def get_nested_value(data, field_path):
+    """Lấy giá trị lồng nhau theo field_path, ví dụ "source.ip"."""
+    parts = field_path.split('.')
+    val = data
+    for p in parts:
+        if p in val:
+            val = val[p]
+        else:
+            return None
+    return val
+
+
+def does_event_match_indicator(event, indicator, mapping):
+    """Check if an event matches an indicator based on the mapping."""
+    print(indicator)
+    for group in mapping:
+        is_group_matched = True
+        for entry in group["entries"]:
+            event_val = get_nested_value(event, entry["field"])
+            indicator_val = indicator.get(entry["value"])
+            if event_val is None or indicator_val is None or event_val != indicator_val:
+                is_group_matched = False
+                break
+        if is_group_matched:
+            return True  # If one group matches (OR condition)
+    return False
+
+
+alerts = []
+for event in events:
+    is_triggered = False
+    for indicator in indicators:
+        if does_event_match_indicator(event, indicator, mapping):
+            is_triggered = True
+            alerts.append(event)
+            break  # Stop checking other indicators for this event
+
+print(alerts)

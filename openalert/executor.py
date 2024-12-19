@@ -80,8 +80,8 @@ class Executor(RuleManager):
 
     def load_enhancer(self):
         """Load enhancer."""
-        self.enhancers['eql'] = EQLEnhancement()
-        self.enhancers['indicatorMatch'] = IndicatorMatchEnhancement()
+        self.enhancers['eql'] = EQLEnhancement(self.client)
+        self.enhancers['indicatorMatch'] = IndicatorMatchEnhancement(self.client)
         openalert_logger.info(fr'Enhancer loaded successfully. Enhancers: {list(self.enhancers.keys())}')
 
 
@@ -130,7 +130,6 @@ class Executor(RuleManager):
         msearch_body = []
         for rule in rules.values():
             query = rule.get('OpenSearchQuery')
-
             # Add exceptions to the query
             if 'exceptionsList' in rule:
                 self._add_exceptions_to_query(query, rule['exceptionsList'])
@@ -150,6 +149,7 @@ class Executor(RuleManager):
 
         # Create alerts
         for index, (filename, rule) in enumerate(rules.items()):
+            print(filename)
             hits = opensearch_data['responses'][index]['hits']['hits']
 
             # Should be use multi-thread for each rule
@@ -160,8 +160,13 @@ class Executor(RuleManager):
             if 'enhancements' in rule:
                 # Run enhancements
                 for enhancement in rule['enhancements']:
+                    if not alerts:
+                        openalert_logger.debug(fr'No alerts to run enhancer enhancer: {enhancer}. Breaking now.')
+                        break
+
                     enhancer = next(iter(enhancement))
-                    self.enhancers[enhancer].process(alerts, enhancement[enhancer])
+                    alerts = self.enhancers[enhancer].process(alerts, enhancement[enhancer])
+            print(json.dumps(alerts))
 
 
     def clean_empty_interval_job(self, interval: int):

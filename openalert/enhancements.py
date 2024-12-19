@@ -1,9 +1,12 @@
+import copy
 import json
 import sys
 
 import eql
 
+from converter import Converter
 from logger import openalert_logger
+from opensearch_client import OpenSearchClient
 
 
 class BaseEnhancement(object):
@@ -11,8 +14,8 @@ class BaseEnhancement(object):
     enhance an alert. These are specified in each rule under the match_enhancements option.
     Generally, the key value pairs in the match module will be contained in the alert body. """
 
-    def __init__(self):
-        pass
+    def __init__(self, client):
+        self.client = client
 
     def process(self, alerts, enhance_params):
         """ Modify the contents of match, a dictionary, in some way """
@@ -79,15 +82,15 @@ class EQLEnhancement(BaseEnhancement):
 
 
     def process(self, alerts, enhance_params):
-        query = enhance_params.get('query', 'any where true')
-        events = []
-
         # Extract match events from alerts
+        events = []
         for index, alert in enumerate(alerts):
             event = alert['event']['match']
             event['@index'] = index
             events.append(event)
 
+        # Execute ELQ query
+        query = enhance_params.get('query', 'any where true')
         result = self.search(events, query)
         if not result:
             return []
@@ -109,5 +112,64 @@ class EQLEnhancement(BaseEnhancement):
 
 class IndicatorMatchEnhancement(BaseEnhancement):
     """ Enhancements that modify the match dictionary based on the indicator that was matched """
-    def process(self, alerts, params):
-        pass
+    def get_nested_value(self, data, field_path):
+        """Lấy giá trị lồng nhau theo field_path, ví dụ "source.ip"."""
+        parts = field_path.split('.')
+        val = data
+        for p in parts:
+            if p in val:
+                val = val[p]
+            else:
+                return None
+        return val
+
+
+    def does_event_match_indicator(self, event, indicator, mapping):
+        """Check if an event matches an indicator based on the mapping."""
+        for group in mapping:
+            is_group_matched = True
+            for entry in group["entries"]:
+                event_val = self.get_nested_value(event, entry["field"])
+                indicator_val = indicator.get(entry["value"])
+                if event_val is None or indicator_val is None or event_val != indicator_val:
+                    is_group_matched = False
+                    break
+            if is_group_matched:
+                return True  # If one group matches (OR condition)
+        return False
+
+
+    def process(self, alerts, enhance_params):
+        # Generate OpenSearch query
+        converter = Converter()
+        query = converter.convert_query(enhance_params['query'])
+        if not query:
+            return []
+
+        # Get data from OpenSearch
+        try:
+            opensearch_data = self.client.search(index=','.join(enhance_params['index']), body=query)['hits']['hits']
+        except Exception as e:
+            openalert_logger.error(f"Cannot get data from OpenSearch. ERROR: {e}")
+            return []
+
+        indicators = []
+        for data in opensearch_data:
+            if not data['_source']:
+                continue
+            indicators.append(data['_source'])
+
+        if not indicators:
+            return []
+
+        mapping = enhance_params['mapping']
+        for alert in copy.deepcopy(alerts):
+            is_triggered = False
+            for indicator in indicators:
+                if self.does_event_match_indicator(alert['event']['match'], indicator, mapping):
+                    is_triggered = True
+                    break
+            if not is_triggered:
+                alerts.remove(alert)
+
+        return alerts

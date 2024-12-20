@@ -172,37 +172,50 @@
       },
       "additionalProperties": false
     },
+
     "enhancements": {
       "type": "array",
       "items": {
-        "anyOf": [
-          {
+        "type": "object",
+        "properties": {
+          "eql": {
             "type": "object",
             "properties": {
-              "eql": {
-                "type": "boolean"
-              },
               "query": {
                 "type": "string"
               }
             },
-            "required": [
-              "eql",
-              "query"
-            ],
+            "required": ["query"],
             "additionalProperties": false
           },
-          {
+          "indicatorMatch": {
             "type": "object",
             "properties": {
-              "indicatorMatch": {
-                "type": "boolean"
-              },
               "index": {
                 "type": "array",
                 "items": {
                   "type": "string"
                 }
+              },
+              "fields": {
+                "type": "object",
+                "properties": {
+                  "includes": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "excludes": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
               },
               "query": {
                 "type": "object",
@@ -220,40 +233,39 @@
               },
               "mapping": {
                 "type": "array",
-                "properties": {
-                  "entries": {
-                    "type": "array",
-                    "items": {
-                      "type": "object",
-                      "properties": {
-                        "field": {
-                          "type": "string"
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "entries": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
                         },
-                        "value": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "field",
-                        "value"
-                      ],
-                      "additionalProperties": false
+                        "required": ["field", "value"],
+                        "additionalProperties": false
+                      }
                     }
-                  }
-                },
-                "required": [
-                  "entries"
-                ],
-                "additionalProperties": false
+                  },
+                  "required": ["entries"],
+                  "additionalProperties": false
+                }
               }
             },
-            "required": [
-              "indicatorMatch",
-              "index",
-              "mapping"
-            ],
+            "required": ["index", "mapping"],
             "additionalProperties": false
           }
+        },
+        "additionalProperties": false,
+        "anyOf": [
+          { "required": ["eql"] },
+          { "required": ["indicatorMatch"] }
         ]
       }
     },

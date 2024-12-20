@@ -15,6 +15,13 @@ modified: 2023-01-02
 
 index:
   - cmccs-*
+  - logs-*
+fields:
+  includes:
+    - rule
+  excludes:
+    - host.mac
+
 
 query:
   selection_1:
@@ -35,36 +42,36 @@ exceptions:
 
 exceptionsList:
   - d84c0ded-edd7-4123-80ed-348bb3ccc444
-  - 123c0ded-edd7-4123-80ed-348bb3ccc123
-
-fields:
-  includes:
-    - source.ip
-    - destination.ip
-  excludes:
-    - host.mac
+  - 12340ded-edd7-4123-80ed-348bb3ccc444
 
 enhancements:
-  - eql: true
-    query: >-
-      any where true
+  - eql:
+      query: >-
+        any where true
 
-  - indicatorMatch: false
-    index:
-      - cmccs-logs-context.management-default
-    query:
-      selection_1:
-        - data_stream.type: "logs"
-      condition: selection_1
-    mapping: # Các entries => OR với nhau. Trong cùng entries => AND
-      - entries:
-          - field: data_stream.type
-            value: datastream_type
-          - field: source.ip
-            value: src_ip
-      - entries:
-          - field: destination.ip
-            value: dst_ip
+  - indicatorMatch:
+      index:
+        - cmccs-*
+        - logs-*
+      fields:
+        includes:
+          - rule
+          - test
+        excludes:
+          - host.mac
+      query:
+        selection_1:
+          - data_stream.type: "logs"
+        condition: selection_1
+
+      mapping: # Các entries => OR với nhau. Trong cùng entries => AND với nhau
+        - entries:
+            - field: rule.level
+              value: rule.id
+        - entries:
+            - field: rule.id
+              value: rule.id
+
 
 riskScore: 20 # 0-100
 severity: low # informational, low, medium, high, critical
@@ -77,7 +84,7 @@ schedule:  # s, m, h
   interval: 1s
   bufferTime: 1m
 
-maxSignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
+maxSignals: 3 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
 
 threat:
   - framework: MITRE ATT&CK
@@ -96,7 +103,6 @@ threat:
 
 actions:
   - email:
-      enabled: true
       to:
         - "user1@gmail.com"
       cc:

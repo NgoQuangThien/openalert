@@ -1,6 +1,6 @@
 from .actions import Action
 
-class IndexerAction(Action):
+class EmailAction(Action):
     def __init__(self):
         super().__init__()
 

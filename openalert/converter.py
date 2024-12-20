@@ -1,4 +1,5 @@
 import copy
+
 from sigma.collection import SigmaCollection
 from sigma.backends.elasticsearch.elasticsearch_lucene import LuceneBackend
 
@@ -9,7 +10,11 @@ from logger import openalert_logger
 QUERY = "query"
 BOOL = "bool"
 FILTER = "filter"
+MUST = "must"
 MUST_NOT = "must_not"
+SOURCE = "_source"
+INCLUDES = "includes"
+EXCLUDES = "excludes"
 OPEN_SEARCH_QUERY = "OpenSearchQuery"
 
 # Generic Sigma Rule (unchanged)
@@ -23,7 +28,10 @@ generic_sigma_rule = {
     "detection": {}
 }
 
-pattern_query = {QUERY: {BOOL: {FILTER: [], MUST_NOT: []}}}
+pattern_query = {
+    SOURCE: {INCLUDES: [], EXCLUDES: []},
+    QUERY: {BOOL: {FILTER: [], MUST_NOT: []}}
+}
 
 
 class Converter(object):
@@ -49,8 +57,15 @@ class Converter(object):
         if not result:
             return False
 
-        source.append(result[QUERY])
+        source.append(result[QUERY][BOOL][MUST][0])
         return True
+
+
+    def add_source_require(self, query: dict, source: dict) -> dict:
+        if 'includes' in source:
+            query[SOURCE][INCLUDES].extend(source['includes'])
+        if 'excludes' in source:
+            query[SOURCE][EXCLUDES].extend(source['excludes'])
 
 
     def convert_rule(self, rule: dict) -> dict:
@@ -60,6 +75,9 @@ class Converter(object):
         if not self.add_to_query(query[QUERY][BOOL][FILTER], rule["query"], FILTER):
             return {}
 
+        if 'fields' in rule:
+            self.add_source_require(query, rule['fields'])
+
         # Convert Exceptions Section
         for exception in rule["exceptions"]:
             if not self.add_to_query(query[QUERY][BOOL][MUST_NOT], exception, MUST_NOT):
@@ -67,19 +85,6 @@ class Converter(object):
 
         rule[OPEN_SEARCH_QUERY] = query
         return rule
-
-
-    def convert_all_rules(self, rules: dict) -> dict:
-        """Generate OpenSearch queries from rules."""
-        for filename, current_rule in rules.copy().items():
-            converted_rule = self.convert_rule(current_rule)
-            if not converted_rule:
-                openalert_logger.warning(fr'Skipping invalid rule syntax: Path={filename}')
-                del rules[filename]
-                continue
-
-            rules[filename] = converted_rule
-        return rules
 
 
     def convert_exception(self, exception: dict) -> dict:
@@ -93,14 +98,20 @@ class Converter(object):
         return exception
 
 
-    def convert_all_exceptions(self, exceptions: dict) -> dict:
-        """Generate OpenSearch queries from exceptions."""
-        for filename, current_exception in exceptions.copy().items():
-            converted_exception = self.convert_exception(current_exception)
-            if not converted_exception:
-                openalert_logger.warning(fr'Skipping invalid exceptionList syntax: Path={filename}')
-                del exceptions[filename]
+    def convert_all(self, data:dict, data_type:str) -> dict:
+        """Generate OpenSearch queries from rules/exceptionsList."""
+        for key, value in data.copy().items():
+            if data_type == 'rules':
+                result = self.convert_rule(value)
+            elif data_type == 'exceptionsList':
+                result = self.convert_exception(value)
+            else:
+                result = {}
+
+            if not result:
+                openalert_logger.warning(fr'Skipping invalid {data_type} syntax: Path={key}')
+                del data[key]
                 continue
 
-            exceptions[filename] = converted_exception
-        return exceptions
+            data[key] = result
+        return data

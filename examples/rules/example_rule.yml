@@ -84,7 +84,7 @@ schedule:  # s, m, h
   interval: 1s
   bufferTime: 1m
 
-maxSignals: 100 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
+maxSignals: 3 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
 
 threat:
   - framework: MITRE ATT&CK
@@ -103,7 +103,6 @@ threat:
 
 actions:
   - email:
-      enabled: true
       to:
         - "user1@gmail.com"
       cc:

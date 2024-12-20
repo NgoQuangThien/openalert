@@ -1,10 +1,10 @@
 import copy
 import json
 import threading
-from itertools import count
 from typing import Dict
 from apscheduler.schedulers.background import BackgroundScheduler
 
+import actions
 from rule import RuleManager
 from converter import Converter, QUERY, BOOL, MUST_NOT
 from logger import openalert_logger
@@ -41,7 +41,6 @@ pattern_alert = {
 class Executor(RuleManager):
     def __init__(self, rules, disabled_rules, exceptions, config):
         super().__init__(rules, disabled_rules, exceptions)
-
         self.debug = config.get("debug", False)
         self.client = OpenSearchClient(config)
         self.writeBackIndex = config['opensearch']['writeBack']
@@ -54,12 +53,16 @@ class Executor(RuleManager):
         self.jobs_lock = threading.Lock()
         self.scheduler = BackgroundScheduler()
 
+        openalert_logger.info('Pre-processing rules and exceptionsList...')
+        self.preprocess()
+
         openalert_logger.info('Loading enhancer...')
         self.enhancers = {}
         self.load_enhancer()
 
-        openalert_logger.info('Pre-processing rules and exceptionsList...')
-        self.preprocess()
+        openalert_logger.info('Loading actions...')
+        self.actions = {}
+        self.load_actions()
 
 
     def preprocess(self):
@@ -85,11 +88,19 @@ class Executor(RuleManager):
         openalert_logger.info(fr'Enhancer loaded successfully. Enhancers: {list(self.enhancers.keys())}')
 
 
-    @staticmethod
-    def _build_alerts(rule, events):
+    def load_actions(self):
+        """Load actions."""
+        self.actions['debug'] = actions.DebugAction()
+        self.actions['indexer'] = actions.IndexerAction()
+        self.actions['email'] = actions.EmailAction()
+        openalert_logger.info(fr'Actions loaded successfully. Actions: {list(self.actions.keys())}')
+
+
+    def _build_alerts(self, rule, events):
         """Helper method to add match events to alerts."""
+        max_signals = rule.get('maxSignals', self.maxSignals)
         alerts = []
-        for event in events:
+        for index, event in enumerate(events):
             alert = copy.deepcopy(pattern_alert)
             alert[TIMESTAMP] = ts_now()
             alert[RULE][RULE_NAME] = rule[RULE_NAME]
@@ -104,6 +115,9 @@ class Executor(RuleManager):
             alert[METADATA][ID] = _meta[ID]
             alert[EVENT][MATCH] = event
             alerts.append(alert)
+
+            if index >= max_signals - 1:
+                break
 
         return alerts
 
@@ -194,13 +208,20 @@ class Executor(RuleManager):
                 continue
 
             # Append alerts of rule into group alerts
-            group_alerts.append(rule_alerts)
+            group_alerts.extend(rule_alerts)
 
-        if self.debug:
-            pass
+            # Execute actions on Rule
+            if self.debug:
+                self.actions['debug'].send(rule_alerts)
+                continue
+
+            for action in rule['actions']:
+                action_name = list(action.keys())[0]  # Lấy tên action (key)
+                if action_name in self.actions:
+                    self.actions[action_name].send(rule_alerts, action[action_name])
 
         # Use the Bulk API to send all alerts to OpenSearch.
-        print(json.dumps(group_alerts))
+        self.actions['indexer'].send(group_alerts)
 
 
     def clean_empty_interval_job(self, interval: int):

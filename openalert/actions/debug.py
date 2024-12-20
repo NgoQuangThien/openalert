@@ -1,5 +1,9 @@
-from openalert.actions import Action
+from .actions import Action
+
+class DebugAction(Action):
+    def __init__(self):
+        super().__init__()
 
 
-class DebugAlerter(Action):
-    pass
+    def send(self, alerts=None, config=None):
+        pass

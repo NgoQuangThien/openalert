@@ -13,7 +13,6 @@ class BaseEnhancement(object):
     """ Enhancements take a match dictionary object and modify it in some way to
     enhance an alert. These are specified in each rule under the match_enhancements option.
     Generally, the key value pairs in the match module will be contained in the alert body. """
-
     def __init__(self, client):
         self.client = client
         self.converter = Converter()
@@ -164,6 +163,5 @@ class IndicatorMatchEnhancement(BaseEnhancement):
                 if self.does_event_match_indicator(event, indicator, enhance_params['mapping']):
                     match_events.append(event)
                     break   # Stop checking other indicators for this event
-
 
         return match_events

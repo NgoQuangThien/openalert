@@ -16,6 +16,12 @@ modified: 2023-01-02
 index:
   - cmccs-*
   - logs-*
+fields:
+  includes:
+    - rule
+  excludes:
+    - host.mac
+
 
 query:
   selection_1:
@@ -38,12 +44,6 @@ exceptionsList:
   - d84c0ded-edd7-4123-80ed-348bb3ccc444
   - 12340ded-edd7-4123-80ed-348bb3ccc444
 
-fields:
-  includes:
-    - agent
-  excludes:
-    - host.mac
-
 enhancements:
   - eql:
       query: >-
@@ -53,19 +53,25 @@ enhancements:
       index:
         - cmccs-*
         - logs-*
+      fields:
+        includes:
+          - rule
+          - test
+        excludes:
+          - host.mac
       query:
         selection_1:
           - data_stream.type: "logs"
         condition: selection_1
+
       mapping: # Các entries => OR với nhau. Trong cùng entries => AND với nhau
         - entries:
-            - field: data_stream.type
-              value: datastream_type
-            - field: source.ip
-              value: src_ip
+            - field: rule.level
+              value: rule.id
         - entries:
-            - field: destination.ip
-              value: dst_ip
+            - field: rule.id
+              value: rule.id
+
 
 riskScore: 20 # 0-100
 severity: low # informational, low, medium, high, critical

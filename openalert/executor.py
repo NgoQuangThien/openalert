@@ -13,7 +13,7 @@ from enhancements import EQLEnhancement, IndicatorMatchEnhancement
 from ultils import ts_now
 
 
-METADATA = 'metadata'
+METADATA = '_metadata'
 INDEX = '_index'
 ID = '_id'
 RULE = 'rule'
@@ -86,28 +86,42 @@ class Executor(RuleManager):
 
 
     @staticmethod
-    def _add_matches(rule, hits):
+    def _build_alerts(rule, events):
         """Helper method to add match events to alerts."""
         alerts = []
+        for event in events:
+            alert = copy.deepcopy(pattern_alert)
+            alert[TIMESTAMP] = ts_now()
+            alert[RULE][RULE_NAME] = rule[RULE_NAME]
+            alert[RULE][RULE_ID] = rule[RULE_ID]
+            alert[RULE][RULE_DESCRIPTION] = rule[RULE_DESCRIPTION]
+            alert[RULE][RISK_SCORE] = rule['riskScore']
+            alert[RULE][SEVERITY_LABEL] = rule['severity']
+            alert[RULE][RULE_TAGS] = rule[RULE_TAGS]
+            alert[RULE][RULE_THREAT] = rule[RULE_THREAT]
+            _meta = event.pop('_meta')
+            alert[METADATA][INDEX] = _meta[INDEX]
+            alert[METADATA][ID] = _meta[ID]
+            alert[EVENT][MATCH] = event
+            alerts.append(alert)
+
+        return alerts
+
+
+    @staticmethod
+    def _build_events(hits):
+        events = []
         for hit in hits:
             if not hit['_source']:
                 continue
 
-            alert = copy.deepcopy(pattern_alert)
-            alert[TIMESTAMP] = ts_now()
-            alert[METADATA][INDEX] = hit['_index']
-            alert[METADATA][ID] = hit['_id']
-            alert[EVENT][MATCH] = hit['_source']
-            alert[RULE][RULE_NAME] = rule['name']
-            alert[RULE][RULE_ID] = rule['id']
-            alert[RULE][RULE_DESCRIPTION] = rule['description']
-            alert[RULE][RISK_SCORE] = rule['riskScore']
-            alert[RULE][SEVERITY_LABEL] = rule['severity']
-            alert[RULE][RULE_TAGS] = rule['tags']
-            alert[RULE][RULE_THREAT] = rule['threat']
-            alerts.append(alert)
+            event = hit['_source']
+            event.setdefault('_meta', {})
+            event['_meta']['_index'] = hit['_index']
+            event['_meta']['_id'] = hit['_id']
+            events.append(event)
 
-        return alerts
+        return events
 
 
     def _add_exceptions_to_query(self, query: dict, exceptions_list: list):
@@ -124,6 +138,7 @@ class Executor(RuleManager):
 
     def run_rule_group(self, interval: int):
         """Run all rules in a group."""
+        openalert_logger.info(fr'Running rule group: {interval}...')
         rules = self.grouped_rules.get(interval, {})
 
         # Prepare OpenSearch multi-search body
@@ -148,25 +163,44 @@ class Executor(RuleManager):
             return
 
         # Create alerts
+        group_alerts = []
         for index, (filename, rule) in enumerate(rules.items()):
             print(filename)
             hits = opensearch_data['responses'][index]['hits']['hits']
 
             # Should be use multi-thread for each rule
-            alerts = self._add_matches(rule, hits)
-            if not alerts:
+            events = self._build_events(hits)
+            if not events:
+                openalert_logger.debug(f"No events found for rule: {rule['name']}")
                 continue
 
+            # Run enhancements
             if 'enhancements' in rule:
-                # Run enhancements
                 for enhancement in rule['enhancements']:
-                    if not alerts:
-                        openalert_logger.debug(fr'No alerts to run enhancer enhancer: {enhancer}. Breaking now.')
-                        break
-
                     enhancer = next(iter(enhancement))
-                    alerts = self.enhancers[enhancer].process(alerts, enhancement[enhancer])
-            print(json.dumps(alerts))
+                    if not events:
+                        openalert_logger.debug(fr'Enhancement process has been stopped. Events are not available to run enhancer: {enhancer}')
+                        break
+                    events = self.enhancers[enhancer].process(events, enhancement[enhancer])
+
+            if not events:
+                openalert_logger.debug(fr'No event match after running enhancements for rule: {rule["name"]}')
+                continue
+
+            # Build alerts for rule
+            rule_alerts = self._build_alerts(rule, events)
+            if not rule_alerts:
+                openalert_logger.debug(f"No alerts found for rule: {rule['name']}")
+                continue
+
+            # Append alerts of rule into group alerts
+            group_alerts.append(rule_alerts)
+
+        if self.debug:
+            pass
+
+        # Use the Bulk API to send all alerts to OpenSearch.
+        print(json.dumps(group_alerts))
 
 
     def clean_empty_interval_job(self, interval: int):

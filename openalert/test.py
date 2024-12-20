@@ -82,7 +82,6 @@ def does_event_match_indicator(event, indicator, mapping):
 
 alerts = []
 for event in events:
-    is_triggered = False
     for indicator in indicators:
         if does_event_match_indicator(event, indicator, mapping):
             is_triggered = True

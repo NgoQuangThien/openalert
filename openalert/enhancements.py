@@ -4,7 +4,7 @@ import sys
 
 import eql
 
-from converter import Converter
+from converter import Converter, pattern_query, QUERY
 from logger import openalert_logger
 from opensearch_client import OpenSearchClient
 
@@ -16,6 +16,7 @@ class BaseEnhancement(object):
 
     def __init__(self, client):
         self.client = client
+        self.converter = Converter()
 
     def process(self, alerts, enhance_params):
         """ Modify the contents of match, a dictionary, in some way """
@@ -76,44 +77,24 @@ class EQLEnhancement(BaseEnhancement):
         eql_events = self._create_events(data, event_type_key, timestamp_key, date_patterns)
 
         # execute the EQL query on the provided data
-        search_result = self._execute_query(eql_events, query)
+        match_event = self._execute_query(eql_events, query)
 
-        return search_result
+        return match_event
 
 
-    def process(self, alerts, enhance_params):
-        # Extract match events from alerts
-        events = []
-        for index, alert in enumerate(alerts):
-            event = alert['event']['match']
-            event['@index'] = index
-            events.append(event)
-
+    def process(self, events, enhance_params):
         # Execute ELQ query
         query = enhance_params.get('query', 'any where true')
         result = self.search(events, query)
         if not result:
             return []
 
-        # Merge match event into alerts
-        for event in result:
-            for index, alert in enumerate(alerts):
-                if event['@index'] == index:
-                    alert['event']['match'] = event
-
-        # Remove event not match in origin alerts
-        alerts = [
-            alert for alert in alerts
-            if '@index' in alert['event']['match'] and alert['event']['match'].pop('@index', None) is not None
-        ]
-
-        return alerts
+        return result
 
 
 class IndicatorMatchEnhancement(BaseEnhancement):
     """ Enhancements that modify the match dictionary based on the indicator that was matched """
     def get_nested_value(self, data, field_path):
-        """Lấy giá trị lồng nhau theo field_path, ví dụ "source.ip"."""
         parts = field_path.split('.')
         val = data
         for p in parts:
@@ -130,7 +111,8 @@ class IndicatorMatchEnhancement(BaseEnhancement):
             is_group_matched = True
             for entry in group["entries"]:
                 event_val = self.get_nested_value(event, entry["field"])
-                indicator_val = indicator.get(entry["value"])
+                indicator_val = self.get_nested_value(indicator,entry["value"])
+
                 if event_val is None or indicator_val is None or event_val != indicator_val:
                     is_group_matched = False
                     break
@@ -139,12 +121,24 @@ class IndicatorMatchEnhancement(BaseEnhancement):
         return False
 
 
-    def process(self, alerts, enhance_params):
-        # Generate OpenSearch query
-        converter = Converter()
-        query = converter.convert_query(enhance_params['query'])
+    def process(self, events, enhance_params):
+        # Use match_all query if query section is empty
+        query = enhance_params.get('query')
         if not query:
-            return []
+            query = { "query": { "match_all": {} } }
+        else:
+            # Generate OpenSearch query
+            query = self.converter.convert_query(query)
+            if not query:
+                openalert_logger.error(fr'IndicatorMatchEnhancement: cannot convert query')
+
+        # If fields exist in IndicatorMatch config
+        fields = enhance_params.get('fields')
+        if fields:
+            tmp_query = copy.deepcopy(pattern_query)
+            tmp_query[QUERY] = query['query']
+            self.converter.add_source_require(tmp_query, fields)
+            query = tmp_query
 
         # Get data from OpenSearch
         try:
@@ -153,6 +147,7 @@ class IndicatorMatchEnhancement(BaseEnhancement):
             openalert_logger.error(f"Cannot get data from OpenSearch. ERROR: {e}")
             return []
 
+        # Build list indicators
         indicators = []
         for data in opensearch_data:
             if not data['_source']:
@@ -162,14 +157,13 @@ class IndicatorMatchEnhancement(BaseEnhancement):
         if not indicators:
             return []
 
-        mapping = enhance_params['mapping']
-        for alert in copy.deepcopy(alerts):
-            is_triggered = False
+        # Check if event match indicator
+        match_events = []
+        for event in events:
             for indicator in indicators:
-                if self.does_event_match_indicator(alert['event']['match'], indicator, mapping):
-                    is_triggered = True
-                    break
-            if not is_triggered:
-                alerts.remove(alert)
+                if self.does_event_match_indicator(event, indicator, enhance_params['mapping']):
+                    match_events.append(event)
+                    break   # Stop checking other indicators for this event
 
-        return alerts
+
+        return match_events

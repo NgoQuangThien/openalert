@@ -61,6 +61,13 @@ class Converter(object):
         return True
 
 
+    def add_source_require(self, query: dict, source: dict) -> dict:
+        if 'includes' in source:
+            query[SOURCE][INCLUDES].extend(source['includes'])
+        if 'excludes' in source:
+            query[SOURCE][EXCLUDES].extend(source['excludes'])
+
+
     def convert_rule(self, rule: dict) -> dict:
         """Convert one rule."""
         query = copy.deepcopy(pattern_query)
@@ -69,10 +76,7 @@ class Converter(object):
             return {}
 
         if 'fields' in rule:
-            if 'includes' in rule['fields']:
-                query[SOURCE][INCLUDES].extend(rule['fields']['includes'])
-            if 'excludes' in rule['fields']:
-                query[SOURCE][EXCLUDES].extend(rule['fields']['excludes'])
+            self.add_source_require(query, rule['fields'])
 
         # Convert Exceptions Section
         for exception in rule["exceptions"]:

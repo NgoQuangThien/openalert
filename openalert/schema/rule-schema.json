@@ -197,6 +197,26 @@
                   "type": "string"
                 }
               },
+              "fields": {
+                "type": "object",
+                "properties": {
+                  "includes": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "excludes": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
               "query": {
                 "type": "object",
                 "required": [
@@ -238,7 +258,7 @@
                 }
               }
             },
-            "required": ["index", "query", "mapping"],
+            "required": ["index", "mapping"],
             "additionalProperties": false
           }
         },

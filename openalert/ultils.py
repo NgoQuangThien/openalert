@@ -22,3 +22,14 @@ def interval_to_seconds(interval: str) -> int:
 def ts_now():
     now = datetime.now(timezone.utc)
     return now.isoformat()
+
+
+def get_nested_value(data, field_path):
+    parts = field_path.split('.')
+    val = data
+    for p in parts:
+        if p in val:
+            val = val[p]
+        else:
+            return None
+    return val

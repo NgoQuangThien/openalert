@@ -47,7 +47,7 @@ exceptionsList:
 enhancements:
   - eql:
       query: >-
-        any where true
+        any where true | count rule.name rule.level
 
   - indicatorMatch:
       index:
@@ -84,7 +84,7 @@ schedule:  # s, m, h
   interval: 1s
   bufferTime: 1m
 
-maxSignals: 3 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
+maxSignals: 2 # số lượng cảnh báo tối đa mà rule này sẽ tạo ra trong một lần chạy
 
 threat:
   - framework: MITRE ATT&CK
@@ -101,15 +101,15 @@ threat:
         name: Non-Standard Encoding
         reference: https://attack.mitre.org/techniques/T1132/002/
 
-actions:
-  - email:
-      to:
-        - "user1@gmail.com"
-      cc:
-        - "cc1@gmail.com"
-      bcc:
-        - "bcc1@gmail.com"
-      subject: "Alert"
-      body: "Alert"
+#actions:
+#  - email:
+#      to:
+#        - "user1@gmail.com"
+#      cc:
+#        - "cc1@gmail.com"
+#      bcc:
+#        - "bcc1@gmail.com"
+#      subject: "Alert"
+#      body: "Alert"
 
 license: "CMCCS license 1.0"

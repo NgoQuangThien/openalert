@@ -305,7 +305,7 @@
     },
     "maxSignals": {
       "type": "integer",
-      "minimum": 0
+      "minimum": 1
     },
     "threat": {
       "type": "array",
@@ -391,7 +391,17 @@
       "uniqueItems": true,
       "items": {
         "type": "object",
-        "additionalProperties": true
+        "anyOf": [
+          {
+            "properties": {
+              "email": {
+                "type": "object"
+              }
+            },
+             "required": ["email"]
+          }
+        ],
+        "additionalProperties": false
       }
     }
   },

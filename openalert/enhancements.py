@@ -1,11 +1,10 @@
 import copy
 import json
-import sys
-
 import eql
 
 from converter import Converter, pattern_query, QUERY
 from logger import openalert_logger
+from ultils import get_nested_value
 from opensearch_client import OpenSearchClient
 
 
@@ -28,8 +27,8 @@ class EQLEnhancement(BaseEnhancement):
     DEFAULT_EVENT_TYPE = "event.category"
     DEFAULT_TIMESTAMP = "@timestamp"
 
-
-    def _create_events(self, data, event_type_key, timestamp_key, date_patterns) -> list:
+    @staticmethod
+    def _create_events(data, event_type_key, timestamp_key, date_patterns) -> list:
         """Create EQL Events from the provided data."""
         eql_events = list()
 
@@ -42,7 +41,8 @@ class EQLEnhancement(BaseEnhancement):
         return eql_events
 
 
-    def _execute_query(self, events, query) -> list:
+    @staticmethod
+    def _execute_query(events, query) -> list:
         """Execute an EQL query on the provided events."""
         schema = eql.Schema.learn(events)
 
@@ -93,24 +93,14 @@ class EQLEnhancement(BaseEnhancement):
 
 class IndicatorMatchEnhancement(BaseEnhancement):
     """ Enhancements that modify the match dictionary based on the indicator that was matched """
-    def get_nested_value(self, data, field_path):
-        parts = field_path.split('.')
-        val = data
-        for p in parts:
-            if p in val:
-                val = val[p]
-            else:
-                return None
-        return val
-
-
-    def does_event_match_indicator(self, event, indicator, mapping):
+    @staticmethod
+    def does_event_match_indicator(event, indicator, mapping):
         """Check if an event matches an indicator based on the mapping."""
         for group in mapping:
             is_group_matched = True
             for entry in group["entries"]:
-                event_val = self.get_nested_value(event, entry["field"])
-                indicator_val = self.get_nested_value(indicator,entry["value"])
+                event_val = get_nested_value(event, entry["field"])
+                indicator_val = get_nested_value(indicator,entry["value"])
 
                 if event_val is None or indicator_val is None or event_val != indicator_val:
                     is_group_matched = False

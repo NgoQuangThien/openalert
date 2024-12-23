@@ -110,9 +110,12 @@ class Executor(RuleManager):
             alert[RULE][SEVERITY_LABEL] = rule['severity']
             alert[RULE][RULE_TAGS] = rule[RULE_TAGS]
             alert[RULE][RULE_THREAT] = rule[RULE_THREAT]
-            _meta = event.pop('_meta')
-            alert[METADATA][INDEX] = _meta[INDEX]
-            alert[METADATA][ID] = _meta[ID]
+            if '_meta' in event:
+                _meta = event.pop('_meta')
+                alert[METADATA][INDEX] = _meta[INDEX]
+                alert[METADATA][ID] = _meta[ID]
+            else:
+                alert.pop(METADATA)
             alert[EVENT][MATCH] = event
             alerts.append(alert)
 
@@ -220,8 +223,20 @@ class Executor(RuleManager):
                 if action_name in self.actions:
                     self.actions[action_name].send(rule_alerts, action[action_name])
 
+
+        if self.debug:
+            return
+
         # Use the Bulk API to send all alerts to OpenSearch.
-        self.actions['indexer'].send(group_alerts)
+        opensearch_config = {
+            'client': self.client,
+            'index': self.writeBackIndex
+        }
+        response = self.actions['indexer'].send(group_alerts, opensearch_config)
+        if response:
+            openalert_logger.info(f"Sent {response[0]} alerts of rules_group_{interval} to Indexer.")
+        else:
+            openalert_logger.error(f"Failed to send alerts of rules_group_{interval} to Indexer.")
 
 
     def clean_empty_interval_job(self, interval: int):

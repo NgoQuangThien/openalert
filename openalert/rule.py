@@ -35,6 +35,8 @@ class RuleManager(object):
         """Remove a rule from the interval group."""
         if interval in self.grouped_rules and file_path in self.grouped_rules[interval]:
             del self.grouped_rules[interval][file_path]
+            return True
+        return False
 
     def remove_rule(self, file_path):
         if file_path not in self.rules:

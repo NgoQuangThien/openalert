@@ -268,13 +268,14 @@ class Executor(RuleManager):
                 self.jobs[interval] = job_id
 
 
-    def remove_rule_and_clean_empty_interval_job(self, file_path):
+    def remove_exits_rule_and_clean_job(self, file_path):
         """Remove rule and clean empty interval job."""
         if file_path not in self.rules:
             return False
         rule = self.rules[file_path]
         interval = interval_to_seconds(rule['schedule']['interval'])
         self.remove_rule(file_path)
+        self.remove_rule_from_group(file_path, interval)
         self.clean_empty_interval_job(interval)
         return True
 

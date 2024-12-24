@@ -12,10 +12,10 @@ opensearch:
   writeBack: cmccs-logs-security.alert-default
 
 rule:
-#  rulesFolder: /Users/admin/DEV/openalert/examples/rules
-#  exceptionsFolder: /Users/admin/DEV/openalert/examples/exceptions
-  rulesFolder: D:/DEV/Python/openalert/examples/rules
-  exceptionsFolder: D:/DEV/Python/openalert/examples/exceptions
+  rulesFolder: /Users/admin/DEV/openalert/examples/rules
+  exceptionsFolder: /Users/admin/DEV/openalert/examples/exceptions
+#  rulesFolder: D:/DEV/Python/openalert/examples/rules
+#  exceptionsFolder: D:/DEV/Python/openalert/examples/exceptions
   schedule: # s, m, h
     interval: 5m
     bufferTime: 1m

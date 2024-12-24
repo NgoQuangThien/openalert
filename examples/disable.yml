@@ -1,5 +1,5 @@
-id: cbcb94e7-efee-4854-85b1-10fc61abe912
-name: Detects data encoding in network traffic
+id: cbcb94e7-efee-4854-85b1-10fc61abe123
+name: Detects data encoding in network
 description: >-
   Detects data encoding in network traffic
 references:
@@ -8,7 +8,7 @@ tags:
   - tags 1
 author: 
   - ThienNQ
-enabled: true
+enabled: false
 status: experimental  # experimental, test, stable
 date: 2023-01-01
 modified: 2023-01-02

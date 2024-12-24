@@ -7,13 +7,8 @@ import time
 
 from config import load_config
 from logger import openalert_logger, configure_logging
-from loader import RulesLoader, ExceptionsLoader
+from loader import RulesLoader, ExceptionsLoader, RULES_SCHEMA_PATH, EXCEPTIONS_SCHEMA_PATH
 from executor import Executor
-
-
-WORK_DIR = os.path.dirname(__file__)
-RULES_SCHEMA_PATH = os.path.join(WORK_DIR, 'schema/rule-schema.json')
-EXCEPTIONS_SCHEMA_PATH = os.path.join(WORK_DIR, 'schema/exception-schema.json')
 
 
 class OpenAlert(object):

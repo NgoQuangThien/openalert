@@ -10,7 +10,8 @@ from converter import Converter, QUERY, BOOL, MUST_NOT
 from logger import openalert_logger
 from opensearch_client import OpenSearchClient
 from enhancements import EQLEnhancement, IndicatorMatchEnhancement
-from ultils import ts_now
+from ultils import ts_now, interval_to_seconds
+from watcher import RulesWatcher, ExceptionsWatcher
 
 
 METADATA = '_metadata'
@@ -41,6 +42,13 @@ pattern_alert = {
 class Executor(RuleManager):
     def __init__(self, rules, disabled_rules, exceptions, config):
         super().__init__(rules, disabled_rules, exceptions)
+        self.rules_folder = config['rule']['rulesFolder']
+        self.exceptions_folder = config['rule']['exceptionsFolder']
+        self.rules_watcher = RulesWatcher(self.rules_folder, self)
+        self.exceptions_watcher = ExceptionsWatcher(self.exceptions_folder,self)
+        self.converter = Converter()
+
+
         self.debug = config.get("debug", False)
         self.client = OpenSearchClient(config)
         self.writeBackIndex = config['opensearch']['writeBack']
@@ -67,15 +75,14 @@ class Executor(RuleManager):
 
     def preprocess(self):
         """Build OpenSearch query for Rule and ExceptionsList"""
-        converter = Converter()
         # Get DSL_Lucene query from Rule
-        self.rules = converter.convert_all(self.rules, 'rules')
+        self.rules = self.converter.convert_all(self.rules, 'rules')
 
         # Get DSL_Lucene query from DisabledRule
-        self.disabled_rules = converter.convert_all(self.disabled_rules, 'rules')
+        self.disabled_rules = self.converter.convert_all(self.disabled_rules, 'rules')
 
         # Get DSL_Lucene query from ExceptionsList
-        self.exceptions = converter.convert_all(self.exceptions, 'exceptionsList')
+        self.exceptions = self.converter.convert_all(self.exceptions, 'exceptionsList')
 
         openalert_logger.info(r"Pre-processing completed. enabledRules: {}, exceptionsList: {}, disabledRules: {}".format(
             len(self.rules), len(self.exceptions), len(self.disabled_rules)))
@@ -261,6 +268,17 @@ class Executor(RuleManager):
                 self.jobs[interval] = job_id
 
 
+    def remove_rule_and_clean_empty_interval_job(self, file_path):
+        """Remove rule and clean empty interval job."""
+        if file_path not in self.rules:
+            return False
+        rule = self.rules[file_path]
+        interval = interval_to_seconds(rule['schedule']['interval'])
+        self.remove_rule(file_path)
+        self.clean_empty_interval_job(interval)
+        return True
+
+
     def setup_jobs(self):
         """Create jobs for all intervals."""
         for interval in self.grouped_rules.keys():
@@ -268,11 +286,15 @@ class Executor(RuleManager):
 
 
     def start(self):
-        """Start the scheduler."""
+        """Start the executor."""
         self.setup_jobs()
+        self.rules_watcher.start()
+        self.exceptions_watcher.start()
         self.scheduler.start()
 
 
     def stop(self):
-        """Stop the scheduler."""
+        """Stop the executor."""
+        self.rules_watcher.stop()
+        self.exceptions_watcher.stop()
         self.scheduler.shutdown(wait=True)

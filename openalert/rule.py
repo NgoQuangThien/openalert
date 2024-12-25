@@ -22,6 +22,14 @@ class RuleManager(object):
             self.add_rule_to_group(file_path, self.rules[file_path])
 
 
+    def add_rule(self, file_path, rule):
+        """Add a rule to the rules."""
+        if file_path in self.rules:
+            return False
+        self.rules[file_path] = rule
+        return True
+
+
     def add_rule_to_group(self, file_path: str, rule: Dict[str, Any]):
         """Add a rule to the interval group."""
         interval = interval_to_seconds(rule['schedule']['interval'])
@@ -50,10 +58,26 @@ class RuleManager(object):
         return True
 
 
+    def add_disabled_rule(self, file_path, rule):
+        """Add a rule to the disabled rules."""
+        if file_path in self.disabled_rules:
+            return False
+        self.disabled_rules[file_path] = rule
+        return True
+
+
     def remove_disabled_rule(self, file_path):
         if file_path not in self.disabled_rules:
             return False
         del self.disabled_rules[file_path]
+        return True
+
+
+    def add_exception(self, file_path, exception):
+        """Add an exception to the exceptionsList."""
+        if file_path in self.exceptions:
+            return False
+        self.exceptions[file_path] = exception
         return True
 
 

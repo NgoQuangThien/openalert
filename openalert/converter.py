@@ -51,7 +51,7 @@ class Converter(object):
         return LuceneBackend().convert(sigma_rule, output_format="dsl_lucene")[0]
 
 
-    def add_to_query(self, source: list, section: dict, key: str) -> bool:
+    def add_to_query(self, source: list, section: dict) -> bool:
         """Helper to convert and add a section to an OpenSearch query."""
         result = self.convert_query(section)
         if not result:
@@ -72,7 +72,7 @@ class Converter(object):
         """Convert one rule."""
         query = copy.deepcopy(pattern_query)
         # Convert Query Section
-        if not self.add_to_query(query[QUERY][BOOL][FILTER], rule["query"], FILTER):
+        if not self.add_to_query(query[QUERY][BOOL][FILTER], rule["query"]):
             return {}
 
         if 'fields' in rule:
@@ -80,7 +80,7 @@ class Converter(object):
 
         # Convert Exceptions Section
         for exception in rule["exceptions"]:
-            if not self.add_to_query(query[QUERY][BOOL][MUST_NOT], exception, MUST_NOT):
+            if not self.add_to_query(query[QUERY][BOOL][MUST_NOT], exception):
                 return {}
 
         rule[OPEN_SEARCH_QUERY] = query
@@ -91,7 +91,7 @@ class Converter(object):
         """Convert one exception."""
         query = copy.deepcopy(pattern_query)
         for exc in exception["exceptions"]:
-            if not self.add_to_query(query[QUERY][BOOL][MUST_NOT], exc, MUST_NOT):
+            if not self.add_to_query(query[QUERY][BOOL][MUST_NOT], exc):
                 return {}
 
         exception[OPEN_SEARCH_QUERY] = query

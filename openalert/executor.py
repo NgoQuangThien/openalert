@@ -1,5 +1,4 @@
 import copy
-import json
 import threading
 from typing import Dict
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -266,6 +265,7 @@ class Executor(RuleManager):
                 self.scheduler.add_job(self.run_rule_group, 'interval', seconds=interval, args=[interval], id=job_id,
                                        max_instances=1)
                 self.jobs[interval] = job_id
+                openalert_logger.info(fr'Created job: {job_id} for interval: {interval} seconds')
 
 
     def remove_exits_rule_and_clean_job(self, file_path):

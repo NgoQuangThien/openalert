@@ -1,0 +1,12 @@
+id: 12340ded-edd7-4123-80ed-348bb3ccc444
+name: Exception 2
+description: |
+  Filters out administrator accounts
+
+exceptions:
+  - name: exception 1
+    description: |
+      Description for exception 1
+    selection_1:
+      test: "test"
+    condition: selection_1

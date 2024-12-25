@@ -24,6 +24,9 @@
         "ssl": {
           "type": "object",
           "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
             "certificate": {
               "type": "string"
             },
@@ -37,19 +40,19 @@
               },
               "minItems": 1
             },
-            "verificationMode": {
-              "type": "string",
-              "enum": ["none", "certificate", "full"]
+            "verifyCerts": {
+              "type": "boolean"
             }
           },
-          "required": ["verificationMode"]
+          "required": ["enabled"]
         },
         "timeout": {
           "type": "integer",
           "minimum": 0
         },
         "writeBack": {
-          "type": "string"
+          "type": "string",
+          "pattern": "^cmccs-([a-zA-Z0-9_.]+)-([a-zA-Z0-9_.]+)-([a-zA-Z0-9_.]+)$"
         }
       },
       "required": ["hosts", "username", "password", "ssl", "writeBack"]

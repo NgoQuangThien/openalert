@@ -1,9 +1,10 @@
 opensearch:
-  hosts: ["https://localhost:9200"]
+  hosts: ["https://10.10.10.101:9200"]
   username: "admin"
   password: "ab@AB@123"
   ssl:
-    verificationMode: none  # To disregard the validity of SSL certificates, change this setting's value to 'none'.
+    enabled: true
+    verifyCerts: false  # To disregard the validity of SSL certificates, change this setting's value to 'none'.
     certificate: /path/to/your/client.crt
     key: /path/to/your/client.key
     certificateAuthorities: [ "/path/to/your/CA.pem" ]
@@ -11,6 +12,8 @@ opensearch:
   writeBack: cmccs-logs-security.alert-default
 
 rule:
+#  rulesFolder: /Users/admin/DEV/openalert/examples/rules
+#  exceptionsFolder: /Users/admin/DEV/openalert/examples/exceptions
   rulesFolder: D:/DEV/Python/openalert/examples/rules
   exceptionsFolder: D:/DEV/Python/openalert/examples/exceptions
   schedule: # s, m, h

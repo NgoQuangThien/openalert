@@ -1,4 +1,3 @@
-PUT _index_template/cmccs-logs-security.alert-default
 {
   "index_patterns": [
     "cmccs-logs-security.alert-default"

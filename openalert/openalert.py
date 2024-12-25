@@ -1,59 +1,73 @@
 import argparse
+import json
 import os
 import signal
 import sys
+import time
 
 from config import load_config
 from logger import openalert_logger, configure_logging
-from loader import RulesLoader, ExceptionsLoader
+from loader import RulesLoader, ExceptionsLoader, RULES_SCHEMA_PATH, EXCEPTIONS_SCHEMA_PATH
+from executor import Executor
 
-
-work_dir = os.path.dirname(__file__)
 
 class OpenAlert(object):
     def __init__(self, config):
-        self.conf = config
-        self.debug = config.get("debug")
+        # Initializing attributes
+        self.running = False
+        self.debug = config.get("debug", False)
 
         if self.debug:
-            openalert_logger.info("In debug mode, alerts will be logged to console but NOT actually sent.")
+            openalert_logger.info("DEBUG mode: ON. Alerts will be logged to console but NOT actually sent.")
 
-        self.opensearch_hosts = config['opensearch']['hosts']
-        self.opensearch_user = config['opensearch']['username']
-        self.opensearch_password = config['opensearch']['password']
+        # Preparing folders
+        self.rules_folder = config['rule']['rulesFolder']
+        self.exceptions_folder = config['rule']['exceptionsFolder']
 
-        self.opensearch_ssl_verificationMode = config['opensearch']['ssl']['verificationMode']
-        self.opensearch_ssl_certificate= config['opensearch']['ssl']['certificate']
-        self.opensearch_ssl_key= config['opensearch']['ssl']['key']
-        self.opensearch_ssl_certificateAuthorities = config['opensearch']['ssl']['certificateAuthorities']
+        openalert_logger.info('Begin loading rules and exceptions...')
 
-        self.opensearch_timeout = config['opensearch'].get('timeout', 30000)
-        self.writeBackIndex = config['opensearch']['writeBack']
+        # Load rules and exceptions
+        self.rules, self.disabled_rules, self.exceptions = self._load_resources()
 
-        self.rulesFolder = config['rule']['rulesFolder']
-        self.exceptionsFolder = config['rule']['exceptionsFolder']
-        self.maxSignals = config['rule']['maxSignals']
-        self.interval = config['rule']['schedule']['interval']
-        self.bufferTime = config['rule']['schedule']['bufferTime']
+        # Executor setup
+        self.executor = Executor(self.rules, self.disabled_rules, self.exceptions, config)
 
-        self.rules = RulesLoader(self.rulesFolder, os.path.join(work_dir,'schema/rule-schema.json')).load_all()
-        self.exceptions = ExceptionsLoader(self.exceptionsFolder, os.path.join(work_dir,'schema/exception-schema.json')).load_all()
+
+    def _load_resources(self):
+        """Helper method to load rules and exceptions using respective loaders."""
+        rules_loader = RulesLoader(self.rules_folder, RULES_SCHEMA_PATH)
+        rules, disabled_rules = rules_loader.load_all()
+
+        exceptions_loader = ExceptionsLoader(self.exceptions_folder, EXCEPTIONS_SCHEMA_PATH)
+        exceptions = exceptions_loader.load_all()
+
+        return rules, disabled_rules, exceptions
 
 
     def start(self):
+        self.executor.start()
+        self.running = True
         openalert_logger.info('OpenAlert is running')
-        while True:
-            break
+
+        while self.running:
+            time.sleep(1)
+            continue
 
 
-def handle_signal(signal, frame):
-    openalert_logger.info('SIGINT received, stopping OpenAlert...')
-    # use os._exit to exit immediately and avoid someone catching SystemExit
-    os._exit(0)
+    def handle_signal(self, signal, frame):
+        openalert_logger.info('SIGINT received, stopping OpenAlert...')
+        self.stop()
+        # use os._exit to exit immediately and avoid someone catching SystemExit
+        os._exit(0)
+
+
+    def stop(self):
+        openalert_logger.info('OpenAlert is shutting down')
+        self.executor.stop()
+        self.running = False
 
 
 def main(args=None):
-    signal.signal(signal.SIGINT, handle_signal)
     if not args:
         args = sys.argv[1:]
 
@@ -78,7 +92,8 @@ def main(args=None):
     openalert_logger.info('Starting OpenAlert...')
 
     open_alert = OpenAlert(config)
-    # open_alert.start()
+    signal.signal(signal.SIGINT, open_alert.handle_signal)
+    open_alert.start()
 
 
 if __name__ == '__main__':

@@ -8,26 +8,30 @@ from logger import openalert_logger
 YAML_EXTENSIONS = ('.yml', '.yaml')
 DATE_FIELDS = ['date', 'modified']
 
+WORK_DIR = os.path.dirname(__file__)
+RULES_SCHEMA_PATH = os.path.join(WORK_DIR, 'schema/rule-schema.json')
+EXCEPTIONS_SCHEMA_PATH = os.path.join(WORK_DIR, 'schema/exception-schema.json')
+
 
 class Loader(object):
-    def __init__(self, directory, schema_path):
-        self.directory = directory
+    def __init__(self, schema_path):
         self.schema = read_yaml(schema_path)
         self.total = 0
         self.enabled = 0
         self.disabled = 0
 
 
-    def get_all_files(self):
+    @staticmethod
+    def get_all_files(directory):
         """Get all files in a directory."""
         files_path = []
         try:
-            for filename in os.listdir(self.directory):
-                file_path = os.path.join(self.directory, filename)
+            for filename in os.listdir(directory):
+                file_path = os.path.join(directory, filename)
                 if os.path.isfile(file_path):
                     files_path.append(file_path)
         except Exception as e:
-            openalert_logger.error(f'Error accessing directory {self.directory}: {e}')
+            openalert_logger.error(f'Error accessing directory {directory}: {e}')
 
         return files_path
 
@@ -82,7 +86,8 @@ class Loader(object):
 
 class RulesLoader(Loader):
     def __init__(self, directory, schema_path):
-        super().__init__(directory, schema_path)
+        super().__init__(schema_path)
+        self.directory = directory
         self.rules = {}
         self.disabled_rules = {}
 
@@ -92,7 +97,7 @@ class RulesLoader(Loader):
         if not os.path.isdir(self.directory):
             raise Exception(f'{self.directory} is not a directory.')
 
-        for file_path in self.get_all_files():
+        for file_path in self.get_all_files(self.directory):
             if not file_path.endswith(YAML_EXTENSIONS):
                 continue
 
@@ -120,7 +125,8 @@ class RulesLoader(Loader):
 
 class ExceptionsLoader(Loader):
     def __init__(self, directory, schema_path):
-        super().__init__(directory, schema_path)
+        super().__init__(schema_path)
+        self.directory = directory
         self.exceptions = {}
 
 
@@ -129,7 +135,7 @@ class ExceptionsLoader(Loader):
         if not os.path.isdir(self.directory):
             raise Exception(f'{self.directory} is not a directory.')
 
-        for file_path in self.get_all_files():
+        for file_path in self.get_all_files(self.directory):
             if not file_path.endswith(YAML_EXTENSIONS):
                 continue
 

@@ -10,14 +10,17 @@ def read_yaml(path) -> dict:
 
 
 def interval_to_seconds(interval: str) -> int:
-    if interval.endswith('s'):
-        return int(interval[:-1])
-    elif interval.endswith('m'):
-        return int(interval[:-1]) * 60
-    elif interval.endswith('h'):
-        return int(interval[:-1]) * 60 * 60
-    else:
-        return 0
+    try:
+        if interval.endswith('s'):
+            return int(interval[:-1])
+        elif interval.endswith('m'):
+            return int(interval[:-1]) * 60
+        elif interval.endswith('h'):
+            return int(interval[:-1]) * 60 * 60
+        else:
+            return 300
+    except ValueError:
+        return 300
 
 def ts_now():
     now = datetime.now(timezone.utc)

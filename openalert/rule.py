@@ -30,6 +30,14 @@ class RuleManager(object):
         return True
 
 
+    def update_rule(self, file_path, rule):
+        """Update a rule to the rules."""
+        if file_path in self.rules:
+            self.rules[file_path] = rule
+            return True
+        return False
+
+
     def add_rule_to_group(self, file_path: str, rule: Dict[str, Any]):
         """Add a rule to the interval group."""
         interval = interval_to_seconds(rule['schedule']['interval'])
@@ -79,6 +87,14 @@ class RuleManager(object):
             return False
         self.exceptions[file_path] = exception
         return True
+
+
+    def update_exception(self, file_path, exception):
+        """Update an exception to the exceptionsList."""
+        if file_path in self.exceptions:
+            self.exceptions[file_path] = exception
+            return True
+        return False
 
 
     def remove_exception(self, file_path):

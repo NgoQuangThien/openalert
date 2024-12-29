@@ -38,10 +38,7 @@ class RulesWatcher(Watcher):
             openalert_logger.info(fr'Failed to load rule: {file_path}')
             return
 
-        converted_rule = self.executor.converter.convert_rule(loaded_rule)
-        if not converted_rule:
-            return
-        self.process_rule(file_path, converted_rule, is_new=True)
+        self.process_rule(file_path, loaded_rule, is_new=True)
 
     def on_modified(self, event):
         file_path = event.src_path
@@ -54,8 +51,7 @@ class RulesWatcher(Watcher):
             self.remove_rule(file_path)
             return
 
-        converted_rule = self.executor.converter.convert_rule(loaded_rule)
-        self.process_rule(file_path, converted_rule, is_new=False)
+        self.process_rule(file_path, loaded_rule, is_new=False)
 
     def on_deleted(self, event):
         file_path = event.src_path
@@ -63,18 +59,20 @@ class RulesWatcher(Watcher):
 
     def process_rule(self, file_path, rule, is_new):
         if not rule:
-            openalert_logger.info(fr'Invalid rule: {file_path}')
             self.remove_rule(file_path)
             return
 
         if rule['enabled']:
+            rule = self.executor.converter.convert_rule(rule)
+            if not rule:
+                return
             self.enable_rule(file_path, rule, is_new)
         else:
             self.disable_rule(file_path, rule, is_new)
 
     def enable_rule(self, file_path, rule, is_new):
         new_interval = interval_to_seconds(rule['schedule']['interval'])
-        old_rule = self.executor.rules.get(file_path)
+        old_rule = self.executor.rules.get(file_path, None)
         old_interval = interval_to_seconds(old_rule['schedule']['interval']) if old_rule else None
 
         if old_rule and old_interval != new_interval:  # Move to a new rule group
@@ -126,8 +124,8 @@ class ExceptionsWatcher(Watcher):
             return
 
         exception = self.exceptions_loader.load(file_path)
-        if not exception or self.exceptions_loader.is_duplicate_entry(exception, self.executor.exceptions):
-            openalert_logger.warning(f'Invalid or duplicate exception: {file_path}')
+        if not exception:
+            openalert_logger.warning(f'Invalid exception: {file_path}')
             return
 
         converted_exception = self.executor.converter.convert_exception(exception)
@@ -137,6 +135,9 @@ class ExceptionsWatcher(Watcher):
             return
 
         if file_path not in self.executor.exceptions:
+            if self.exceptions_loader.is_duplicate_entry(converted_exception, self.executor.exceptions):
+                openalert_logger.info(fr'Duplicate exception: {file_path}')
+                return
             self.executor.add_exception(file_path, converted_exception)
             action = "Added"
         else:
